@@ -1,0 +1,128 @@
+e87ab6f named repo workflow
+59e706a WORKING workflow triggers, testing repo workflow for build config
+67679e3 WORKING workflow triggers, added way to view build matrices content
+c5a7180 WORKING workflow triggers, added way to view build matrices content
+9909605 WORKING workflow triggers, added way to view build matrices content
+bdad3ac testing with new trigger jobs and seperated matrices
+59b15b2 testing with new parent default file
+3597a96 testing with added trigger job for defaults with defaults hard coded
+c2b3ca9 testing with added trigger job for defaults
+c31733b testing with added trigger job for defaults
+fc0effe testing new implementation
+af5ac68 testing new implementation
+8b6f49c testing new implementation
+ba61ff8 testing new implementation
+94bc454 testing new implementation
+c9ce260 testing new implementation
+51c30fd testing prev code #90 changed repo to true in json
+1eaa626 testing prev code #90
+f788ea0 testing prev code #90
+c156fd2 testing prev code #90
+6120043 testing conditional logic
+f8af230 testing conditional logic after reverting code (true/false)
+a7b7974 testing conditional logic after reverting code (true/true)
+b66070b Create repo-build.yml
+bf09169 testing conditional logic after reverting code
+e829705 testing conditional logic after reverting code
+6e24d73 testing conditional logic in triggers
+5655876 testing conditional logic in triggers
+b6dd598 testing conditional logic in triggers
+f607a9e testing combind jobs
+55e8223 testing combind jobs
+0612164 testing combind jobs
+7753f13 testing combind jobs
+e05d030 testing combind jobs
+071725c testing combind jobs
+1867f40 testing new variables to trigger workflows
+79634e9 testing new variables to trigger workflows
+8080248 testing new jobs under workflow triggering
+ab9f5c8 testing new jobs under workflow triggering
+52611f2 testing new jobs under workflow triggering
+b09e2cc testing new jobs under workflow triggering
+211eb72 testing new jobs fortriggering
+b904cb0 testing new jobs fortriggering
+98e989b reverting code
+9a1a1d3 testing fix to issue regarding not all image builds being triggerd (new logic)
+4b2775c testing fix to issue regarding not all image builds being triggerd (true)
+01b24d8 testing fix to issue regarding not all image builds being triggerd
+283f5f2 testing fix to issue regarding not all image builds being triggerd
+69137bf testing trigger issue...again
+828a937 testing matrix build bug
+8406abf testing matrix build bug
+9c7238b testing read fix with strings not empty
+88452f0 testing read fix
+4bac9ca testing read fix
+a514078 testing trigger fix
+5ac7ecb testing trigger fix
+9c2dcf4 testing newn implementation
+328329a testing newn implementation
+3a90463 testing newn implementation
+acf513f reverting code and trying to implement parsing again.
+b5cbffb fixing issues with parsing
+6694e51 fixing issues with parsing
+8aa9fdb fixing issues with list as parameters
+d296534 fixing issues with list as parameters
+7e7fd60 fixing issues with list as parameters
+9b21ba3 testing lists as parameters
+7d73e04 testing lists as parameters
+e5f5c7b testing reading in parameters
+ba72b58 testing reading in parameters
+cb68f50 testing reading in parameters
+4f3f190 testing default triggers
+147a5e1 testing default triggers
+78e8050 testing default triggers
+8dc674f testing default triggers
+482a27a testing trigger mech
+b89fcd6 testing new logic and flow
+de3dbfc testing new logic and flow
+99b00ea testing new logic and flow
+3ab422d testing new logic and flow
+3b56d10 testing new logic and flow
+aaf3a61 testing new logic and flow
+4bf7405 testing fix to default config build
+090d0e9 testing fix to default config build
+b5c365c testing fix to default config build
+151b893 testing fix to default config build
+a8eff8a testing fix to push to harbor and docker
+ca417aa testing fix to push to harbor and docker
+01393ae testing fix to push to harbor and docker
+10d7645 testing workflow
+dfb80f4 fixing trigger issue
+f5db71e fixing trigger issue
+a27d720 moved push operations to build-containers
+3556030 fixing docker push issue
+5aa216c fixing docker push issue
+3a340e8 fixing docker push issue
+d648dc6 fixing docker push issue and read config issue
+6e8725c fixing docker push issue and read config issue
+934806d fixing push to docker issue
+6c43186 fixing config fil path issues
+03d7465 fixing config fil path issues
+67bc728 fixing config fil path issues
+e080e5a Merge branch 'testing-branch' of https://github.com/PPathu/osg-images into testing-branch
+11cdf11 fixing config fil path issues
+a202240 Create standard-build.yml
+36e4127 Delete .github/workflows/standard-build.yml
+6158335 trying to get workflow to appear in actions tab
+0ab2cfd testing first branched workflow
+7318ce9 testing to see if the default parameters function
+03bb3c8 testing default parameters and config file creation
+9cf3b1e trying to fix config file not found error
+64a9701 trying to fix EOF error using echo instead
+38beaee testing EOF error fix
+443f069 testing first run of implentations for config file
+422fbf4 synced fork
+13f4d3c commented code and fixed image build list
+18705f4 fully commented version of code
+67685fb Merge pull request #188 from brianhlin/move-to-standard-el8-base
+96134ee Move to standard EL8 base
+c5993d9 checking to see if experimental enviornment is properly setup x2
+8933e6c checking to see if experimental enviornment is properly setup
+8edc5ff Merge pull request #187 from mwestphall/SOFTWARE-5448-squid-container-exit-on-squid-exit
+8189740 Add debug step to print generated image list
+e9a5888 Add debug step to print generated image list
+caee173 testing secrets
+643ace1 SOFTWARE-5448: Exit the supervisord init process if squid exits
+0437a8e FIXME: Remove unnecessary directories for faster actions
+bae1269 FIXME: Modify GitHub action to run on testing branch
+6d7442b Merge pull request #186 from rynge/mailchimp-updates

@@ -1,19 +1,21 @@
 name: Standard Build
 
+  // Required variables to build the image passed from the build-containers file
+
 on:
   workflow_dispatch:
     inputs:
       image:
         description: 'Image to build'
         required: true
-      base_name:
+      Base_os:
         description: 'Base OS name'
         required: true
       base_version:
         description: 'Base OS version'
         required: true
       base_repo:
-        description: 'Base repository'
+        description: 'Base OSG Yum repository'
         required: true
 
 jobs:
@@ -28,15 +30,17 @@ jobs:
         id: mkdatetag
         run: echo "dtag=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
 
-      - name: Build ${{ github.event.inputs.image }}:${{ github.event.inputs.base_name }}-${{ github.event.inputs.base_repo }}
+          // Builds the images based on the parameters pass fron the buil-containers file
+
+      - name: Build ${{ github.event.inputs.image }}:${{ github.event.inputs.Base_os }}-${{ github.event.inputs.base_repo }}
         uses: opensciencegrid/build-container-action@v0.6.0
         with:
           osg_series: ${{ github.event.inputs.base_version }}
           osg_repo: ${{ github.event.inputs.base_repo }}
           context: ${{ github.event.inputs.image }}
-          base_os: ${{ github.event.inputs.base_name }}
+          base_os: ${{ github.event.inputs.Base_os }}
         env:
-          BASE_NAME: ${{ github.event.inputs.base_name }}
+          Base_os: ${{ github.event.inputs.Base_os }}
           BASE_VERSION: ${{ github.event.inputs.base_version }}
           BASE_REPO: ${{ github.event.inputs.base_repo }}
 
@@ -47,7 +51,7 @@ jobs:
           repo: development
           osg_series: ${{ github.event.inputs.base_version }}
           context: ${{ github.event.inputs.image }}
-          base_os: ${{ github.event.inputs.base_name }}
+          base_os: ${{ github.event.inputs.Base_os }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
@@ -59,7 +63,7 @@ jobs:
           repo: testing
           osg_series: ${{ github.event.inputs.base_version }}
           context: ${{ github.event.inputs.image }}
-          base_os: ${{ github.event.inputs.base_name }}
+          base_os: ${{ github.event.inputs.Base_os }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
@@ -71,7 +75,7 @@ jobs:
           repo: release
           osg_series: ${{ github.event.inputs.base_version }}
           context: ${{ github.event.inputs.image }}
-          base_os: ${{ github.event.inputs.base_name }}
+          base_os: ${{ github.event.inputs.Base_os }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
@@ -83,7 +87,7 @@ jobs:
           repo: development
           osg_series: ${{ github.event.inputs.base_version }}
           context: ${{ github.event.inputs.image }}
-          base_os: ${{ github.event.inputs.base_name }}
+          base_os: ${{ github.event.inputs.Base_os }}
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
@@ -95,7 +99,7 @@ jobs:
           repo: testing
           osg_series: ${{ github.event.inputs.base_version }}
           context: ${{ github.event.inputs.image }}
-          base_os: ${{ github.event.inputs.base_name }}
+          base_os: ${{ github.event.inputs.Base_os }}
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
@@ -107,7 +111,7 @@ jobs:
           repo: release
           osg_series: ${{ github.event.inputs.base_version }}
           context: ${{ github.event.inputs.image }}
-          base_os: ${{ github.event.inputs.base_name }}
+          base_os: ${{ github.event.inputs.Base_os }}
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
