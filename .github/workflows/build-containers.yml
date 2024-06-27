@@ -110,7 +110,7 @@ jobs:
       matrix:
         image: ${{ fromJson(needs.build-image-list.outputs.images) }}
     steps:
-      - name: Push to Harbor
+      - name: Push to Harbor (${env.base_version}-${env.base_repo})
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
@@ -122,11 +122,83 @@ jobs:
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
-      - name: Push to Docker Hub
+      - name: Push to Docker Hub (${env.base_version}-${env.base_repo})
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
           repo: ${{ env.base_repo }}
+          osg_series: ${{ env.base_version }}
+          context: ${{ matrix.image }}
+          base_os: ${{ env.base_os }}
+          registry_url: docker.io
+          registry_user: ${{ secrets.DOCKER_USERNAME }}
+          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push to Harbor (${{ env.base_version }}-development)
+        if: ${{ env.base_version != '23' }}
+        uses: opensciencegrid/push-container-action@main
+        with:
+          repo: development
+          osg_series: ${{ env.base_version }}
+          context: ${{ matrix.image }}
+          base_os: ${{ env.base_os }}
+          registry_url: hub.opensciencegrid.org
+          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+
+      - name: Push to Harbor (${{ env.base_version }}-testing)
+        if: always()
+        uses: opensciencegrid/push-container-action@main
+        with:
+          repo: testing
+          osg_series: ${{ env.base_version }}
+          context: ${{ matrix.image }}
+          base_os: ${{ env.base_os }}
+          registry_url: hub.opensciencegrid.org
+          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+
+      - name: Push to Harbor (${{ env.base_version }}-release)
+        if: always()
+        uses: opensciencegrid/push-container-action@main
+        with:
+          repo: release
+          osg_series: ${{ env.base_version }}
+          context: ${{ matrix.image }}
+          base_os: ${{ env.base_os }}
+          registry_url: hub.opensciencegrid.org
+          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+
+      - name: Push to Docker Hub (${{ env.base_version }}-development)
+        if: always()
+        uses: opensciencegrid/push-container-action@main
+        with:
+          repo: development
+          osg_series: ${{ env.base_version }}
+          context: ${{ matrix.image }}
+          base_os: ${{ env.base_os }}
+          registry_url: docker.io
+          registry_user: ${{ secrets.DOCKER_USERNAME }}
+          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push to Docker Hub (${{ env.base_version }}-testing)
+        if: always()
+        uses: opensciencegrid/push-container-action@main
+        with:
+          repo: testing
+          osg_series: ${{ env.base_version }}
+          context: ${{ matrix.image }}
+          base_os: ${{ env.base_os }}
+          registry_url: docker.io
+          registry_user: ${{ secrets.DOCKER_USERNAME }}
+          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push to Docker Hub (${{ env.base_version }}-release)
+        if: always()
+        uses: opensciencegrid/push-container-action@main
+        with:
+          repo: release
           osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
           base_os: ${{ env.base_os }}
