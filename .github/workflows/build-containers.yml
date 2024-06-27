@@ -89,7 +89,8 @@ jobs:
               $base_version[] as $version |
               {base_os: $os, base_version: $version, base_repo: $base_repo}
             ]')
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "Generated matrix: $matrix"
+          echo "::set-output name=matrix::$matrix"
 
   build:
     runs-on: ubuntu-latest
