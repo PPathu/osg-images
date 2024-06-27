@@ -141,32 +141,17 @@ jobs:
   dispatch-builds:
     runs-on: ubuntu-latest
     needs: check-config
-    strategy:
-      matrix:
-        build_type: [build_config, default_config]
+    outputs:
+      matrix: ${{ steps.determine-matrix.outputs.matrix }}
     steps:
-      - name: Trigger builds for ${{ matrix.build_type }}
+      - name: Determine matrix to use
+        id: determine-matrix
         run: |
-          if [ "${{ matrix.build_type }}" == "build_config" ]; then
-            echo "::set-output name=matrix::${{ needs.check-config.outputs.image_matrix }}"
+          if [ "${{ needs.check-config.outputs.image_matrix }}" != "" ]; then
+            echo "matrix=${{ needs.check-config.outputs.image_matrix }}" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=matrix::${{ needs.check-config.outputs.default_image_matrix }}"
+            echo "matrix=${{ needs.check-config.outputs.default_image_matrix }}" >> $GITHUB_OUTPUT
           fi
-      - name: Trigger build job
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const matrix = process.env.MATRIX;
-            const matrixObj = JSON.parse(matrix);
-            await github.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'build-containers.yml',
-              ref: context.ref,
-              inputs: {
-                matrix: JSON.stringify(matrixObj)
-              }
-            });
 
   trigger-builds:
     needs: dispatch-builds
@@ -222,7 +207,7 @@ jobs:
           repo: release
           osg_series: ${{ matrix.build_config.base_version }}
           context: ${{ matrix.build_config.image }}
-          base_os: ${{matrix.build_config.base_name }}
+          base_os: ${{ matrix.build_config.base_name }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
@@ -238,7 +223,7 @@ jobs:
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
-  
+
       - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-testing)
         if: always()
         uses: opensciencegrid/push-container-action@main
@@ -250,7 +235,7 @@ jobs:
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
-    
+      
       - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-release)
         if: always()
         uses: opensciencegrid/push-container-action@main
