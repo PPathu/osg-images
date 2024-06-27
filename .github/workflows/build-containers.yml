@@ -77,26 +77,22 @@ jobs:
             echo "config_exists=true" >> $GITHUB_OUTPUT
           else
             echo "config_exists=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Parse build-config.json if it exists
         id: parse-config
         if: steps.check-jsonfile.outputs.config_exists == 'true'
         run: |
           CONFIG_FILE="${{ matrix.image }}/build-config.json"
-          base_os=$(jq -r '.base_os.base_name | join(" ")' $CONFIG_FILE)
-          base_version=$(jq -r '.base_os.base_version | join(" ")' $CONFIG_FILE)
+          base_os=$(jq -r '.base_os.base_name[]' $CONFIG_FILE | tr "," "\n")
+          base_version=$(jq -r '.base_os.base_version[]' $CONFIG_FILE | tr "," "\n")
           base_repo=$(jq -r '.base_repo' $CONFIG_FILE)
-          matrix=$(jq -n \
-            --arg base_os "$base_os" \
-            --arg base_version "$base_version" \
-            '[
-              ($base_os | split(" ")) as $os_list |
-              ($base_version | split(" ")) as $version_list |
-              $os_list[] as $os |
-              $version_list[] as $version |
-              {base_os: $os, base_version: $version}
-            ]')
+          matrix=$(jq -n --argjson base_os "$(jq -n '$ARGS.positional' --args $base_os)" \
+                           --argjson base_version "$(jq -n '$ARGS.positional' --args $base_version)" \
+                           '[
+                             $base_os[] as $os |
+                             $base_version[] as $version |
+                             {base_os: $os, base_version: $version}
+                           ]')
           echo "matrix=$matrix" >> $GITHUB_ENV
           echo "base_repo=$base_repo" >> $GITHUB_ENV
 
@@ -104,13 +100,12 @@ jobs:
         if: steps.check-jsonfile.outputs.config_exists == 'false'
         run: |
           default_config=$(cat opensciencegrid/default-build-config.json)
-          base_name_standard=$(echo $default_config | jq -r '.standard_build.base_os.base_name | join(" ")')
-          base_version_standard=$(echo $default_config | jq -r '.standard_build.base_os.base_version | join(" ")')
+          base_name_standard=$(echo $default_config | jq -r '.standard_build.base_os.base_name[]' | tr "," "\n")
+          base_version_standard=$(echo $default_config | jq -r '.standard_build.base_os.base_version[]' | tr "," "\n")
           base_repo_standard=$(echo $default_config | jq -r '.standard_build.base_repo')
-          base_name_repo=$(echo $default_config | jq -r '.repo_build.base_os.base_name | join(" ")')
-          base_version_repo=$(echo $default_config | jq -r '.repo_build.base_os.base_version | join(" ")')
+          base_name_repo=$(echo $default_config | jq -r '.repo_build.base_os.base_name[]' | tr "," "\n")
+          base_version_repo=$(echo $default_config | jq -r '.repo_build.base_os.base_version[]' | tr "," "\n")
           base_repo_repo=$(echo $default_config | jq -r '.repo_build.base_repo')
-          
           echo "base_name_standard=$base_name_standard" >> $GITHUB_OUTPUT
           echo "base_version_standard=$base_version_standard" >> $GITHUB_OUTPUT
           echo "base_repo_standard=$base_repo_standard" >> $GITHUB_OUTPUT
@@ -118,15 +113,15 @@ jobs:
           echo "base_version_repo=$base_version_repo" >> $GITHUB_OUTPUT
           echo "base_repo_repo=$base_repo_repo" >> $GITHUB_OUTPUT
           if [[ "$standard_enabled" == "true" ]]; then
-            for base_name in $(echo $base_name_standard); do
-              for base_version in $(echo $base_version_standard); do
+            for base_name in $base_name_standard; do
+              for base_version in $base_version_standard; do
                 echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo_standard\", \"build_type\": \"standard\" }" >> matrix_default.json
               done
             done
           fi
           if [[ "$repo_enabled" == "true" ]]; then
-            for base_name in $(echo $base_name_repo); do
-              for base_version in $(echo $base_version_repo); do
+            for base_name in $base_name_repo; do
+              for base_version in $base_version_repo; do
                 echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo_repo\", \"build_type\": \"repo\" }" >> matrix_default.json
               done
             done
@@ -137,7 +132,7 @@ jobs:
         if: steps.check-jsonfile.outputs.config_exists == 'false'
         run: |
           matrix_default=$(jq -c -s '.' matrix_default.json)
-          echo "image_matrix=$matrix_default" >> $GITHUB_OUTPUT
+          echo "image_matrix=$matrix_default" >> $GITHUB_ENV
 
       - name: Build ${{ matrix.image }}:${{ env.base_version }}-${{ env.base_repo }}
         continue-on-error: false
@@ -166,8 +161,8 @@ jobs:
         run: |
           CONFIG_FILE="${{ matrix.image }}/build-config.json"
           if [[ -f "$CONFIG_FILE" ]]; then
-            base_os=$(jq -r '.base_os.base_name | join(" ")' $CONFIG_FILE)
-            base_version=$(jq -r '.base_os.base_version | join(" ")' $CONFIG_FILE)
+            base_os=$(jq -r '.base_os.base_name[]' $CONFIG_FILE | tr "," "\n")
+            base_version=$(jq -r '.base_os.base_version[]' $CONFIG_FILE | tr "," "\n")
             base_repo=$(jq -r '.base_repo' $CONFIG_FILE)
           else
             base_os="el7 el8"
@@ -213,7 +208,6 @@ jobs:
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
-
       - name: Push to Harbor (${{ env.base_version }}-testing)
         if: always()
         uses: opensciencegrid/push-container-action@main
