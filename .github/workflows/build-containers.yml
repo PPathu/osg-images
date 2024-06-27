@@ -84,9 +84,11 @@ jobs:
             --argjson base_os "$base_os" \
             --argjson base_version "$base_version" \
             --arg base_repo "$base_repo" \
-            '{
-              "include": $base_os | map({"base_os": ., "base_version": $base_version[], "base_repo": $base_repo}) | add'
-            )
+            '$base_os as $os | $base_version as $version |
+            [
+              ($os | map(. as $o | {base_os: $o})) * ($version | map(. as $v | {base_version: $v})) |
+              .[] | .base_repo = $base_repo
+            ]')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
   build:
@@ -97,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: ${{ fromJson(needs.generate-matrix.outputs.matrix).include }}
+        config: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -122,7 +124,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: ${{ fromJson(needs.generate-matrix.outputs.matrix).include }}
+        config: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - name: Push to Harbor (${matrix.config.base_version}-${matrix.config.base_repo})
         if: always()
