@@ -3,23 +3,22 @@ name: Build and push container images
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
-      - testing-branch  # Trigger on push to the testing-branch
-  pull_request:  # Trigger on pull requests
-  workflow_dispatch:  
+      - main
+      - testing-branch
+  pull_request:
+  workflow_dispatch:
   repository_dispatch:
-    types: [dispatch-build]  
+    types: [dispatch-build]
 
-# Jobs to be executed
 jobs:
   make-date-tag:
-    runs-on: ubuntu-latest  # Job runs on the latest version of Ubuntu
+    runs-on: ubuntu-latest
     outputs:
-      dtag: ${{ steps.mkdatetag.outputs.dtag }} 
+      dtag: ${{ steps.mkdatetag.outputs.dtag }}
     steps:
-      - name: make date tag  
-        id: mkdatetag 
-        run: echo "dtag=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT  
+      - name: make date tag
+        id: mkdatetag
+        run: echo "dtag=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
 
   build-image-list:
     runs-on: ubuntu-latest
@@ -33,8 +32,7 @@ jobs:
       - id: image-list
         run: |
           ORG_DIR=opensciencegrid
-          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]] ||
-             [[ $GITHUB_EVENT_NAME == 'push' ]]; then
+          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]] || [[ $GITHUB_EVENT_NAME == 'push' ]]; then
                if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
                    BASE=$(git merge-base origin/$GITHUB_BASE_REF HEAD)
                elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
@@ -60,6 +58,7 @@ jobs:
           fi
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n")')
           echo "json=$image_json" >> $GITHUB_OUTPUT
+
   build:
     runs-on: ubuntu-latest
     needs: build-image-list
@@ -74,18 +73,12 @@ jobs:
         id: check-jsonfile
         run: |
           if [ ! -f "${{ matrix.image }}/build-config.json" ]; then
-            echo "No build-config.json found in ${{ matrix.image }}. Creating default build-config.json."
-            mkdir -p "${{ matrix.image }}"
-            echo '{' > "${{ matrix.image }}/build-config.json"
-            echo '  "base_os": {' >> "${{ matrix.image }}/build-config.json" 
-            echo '    "base_name": "el8",' >> "${{ matrix.image }}/build-config.json" # Default base OS 
-            echo '    "base_version": "3.6"' >> "${{ matrix.image }}/build-config.json" # Default base OS version
-            echo '  },' >> "${{ matrix.image }}/build-config.json"
-            echo '  "base_repo": "testing"' >> "${{ matrix.image }}/build-config.json" #Default base repo
-            echo '}' >> "${{ matrix.image }}/build-config.json"
+            echo "No build-config.json found in ${{ matrix.image }}. Skipping build."
+            exit 1
           else
             echo "build-config.json exists in ${{ matrix.image }}"
           fi
+
       - name: Read build-config.json in ${{ matrix.image }}
         id: read-jsonfile
         run: |
@@ -99,6 +92,7 @@ jobs:
           echo "base_name=$base_name" >> $GITHUB_ENV
           echo "base_version=$base_version" >> $GITHUB_ENV
           echo "base_repo=$base_repo" >> $GITHUB_ENV
+
       - name: Build ${{ matrix.image }}:${{ env.base_name }}-${{ env.base_repo }}
         if: steps.check-jsonfile.conclusion == 'success'
         continue-on-error: ${{ env.base_repo == 'development' }}
