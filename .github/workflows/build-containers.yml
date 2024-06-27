@@ -65,6 +65,7 @@ jobs:
     needs: [make-date-tag, build-image-list]
     outputs:
       image_matrix: ${{ steps.create-matrix.outputs.image_matrix }}
+      default_image_matrix: ${{ steps.create-default-matrix.outputs.image_matrix }}
     strategy:
       fail-fast: false
       matrix:
@@ -120,18 +121,22 @@ jobs:
             done
           done
           cat matrix_default.json
-          matrix=$(jq -c -s '.' matrix_default.json)
-          echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
+          matrix_default=$(jq -c -s '.' matrix_default.json)
+          echo "image_matrix=$matrix_default" >> $GITHUB_OUTPUT
 
       - name: Create build matrix
         id: create-matrix
+        if: steps.check-jsonfile.outputs.config_exists == 'true'
         run: |
-          if [ -f matrix.json ]; then
-            matrix=$(jq -c -s '.' matrix.json)
-          else
-            matrix=$(jq -c -s '.' matrix_default.json)
-          fi
+          matrix=$(jq -c -s '.' matrix.json)
           echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
+
+      - name: Create default build matrix
+        id: create-default-matrix
+        if: steps.check-jsonfile.outputs.config_exists == 'false'
+        run: |
+          matrix_default=$(jq -c -s '.' matrix_default.json)
+          echo "image_matrix=$matrix_default" >> $GITHUB_OUTPUT
 
   trigger-builds:
     needs: check-config
@@ -139,7 +144,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build_config: ${{ fromJson(needs.check-config.outputs.image_matrix) }}
+        build_config: ${{ fromJson(needs.check-config.outputs.image_matrix) }}${{ fromJson(needs.check-config.outputs.default_image_matrix) }}
     steps:
       - name: Debug build_config
         run: echo ${{ matrix.build_config }}
@@ -216,7 +221,7 @@ jobs:
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push to Docker Hub(${{ matrix.build_config.base_version }}-release)
+      - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-release)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
