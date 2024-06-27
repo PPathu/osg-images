@@ -105,6 +105,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Debug matrix
+        run: echo "Matrix: ${{ toJson(matrix.config) }}"
+
       - name: Build ${{ matrix.config.base_os }}:${{ matrix.config.base_version }}-${{ matrix.config.base_repo }}
         continue-on-error: false
         uses: opensciencegrid/build-container-action@v0.6.0
