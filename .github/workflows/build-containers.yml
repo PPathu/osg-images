@@ -65,7 +65,6 @@ jobs:
     needs: [make-date-tag, build-image-list]
     outputs:
       image_matrix: ${{ steps.create-matrix.outputs.image_matrix }}
-      default_image_matrix: ${{ steps.create-default-matrix.outputs.image_matrix }}
     strategy:
       fail-fast: false
       matrix:
@@ -103,6 +102,7 @@ jobs:
           echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
 
       - name: Read default-build-config.json
+        id: read-default-config
         if: steps.check-jsonfile.outputs.config_exists == 'false'
         run: |
           default_config=$(cat opensciencegrid/default-build-config.json)
@@ -111,11 +111,11 @@ jobs:
           base_repo=$(echo $default_config | jq -r '.base_repo')
           for base_name in $(echo $base_names | tr "," "\n"); do
             for base_version in $(echo $base_versions | tr "," "\n"); do
-              echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix_default.json
+              echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix.json
             done
           done
-          matrix_default=$(jq -c -s '.' matrix_default.json)
-          echo "image_matrix=$matrix_default" >> $GITHUB_OUTPUT
+          matrix=$(jq -c -s '.' matrix.json)
+          echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
 
   trigger-builds:
     needs: check-config
@@ -211,4 +211,3 @@ jobs:
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
-
