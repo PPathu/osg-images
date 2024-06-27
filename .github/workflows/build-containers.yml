@@ -2,9 +2,6 @@ name: Build and push container images
 
 on:
   push:
-    branches:
-      - main
-      - testing-branch
   pull_request:
   workflow_dispatch:
   repository_dispatch:
@@ -32,7 +29,8 @@ jobs:
       - id: image-list
         run: |
           ORG_DIR=opensciencegrid
-          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]] || [[ $GITHUB_EVENT_NAME == 'push' ]]; then
+          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]] ||
+             [[ $GITHUB_EVENT_NAME == 'push' ]]; then
                if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
                    BASE=$(git merge-base origin/$GITHUB_BASE_REF HEAD)
                elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
@@ -56,6 +54,7 @@ jobs:
                                       -type d \
                                       -printf "$ORG_DIR/%P\n")
           fi
+
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n")')
           echo "json=$image_json" >> $GITHUB_OUTPUT
 
@@ -69,50 +68,41 @@ jobs:
       matrix:
         image: ${{ fromJson(needs.build-image-list.outputs.images) }}
     steps:
-      - name: Check for build-config.json in ${{ matrix.image }}
-        id: check-jsonfile
-        run: |
-          if [ ! -f "${{ matrix.image }}/build-config.json" ]; then
-            echo "No build-config.json found in ${{ matrix.image }}. Skipping build."
-            exit 1
-          else
-            echo "build-config.json exists in ${{ matrix.image }}"
-          fi
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Read build-config.json in ${{ matrix.image }}
-        id: read-jsonfile
+      - name: Read build config if available
+        id: read-config
         run: |
-          config=$(cat ${{ matrix.image }}/build-config.json)
-          base_name=$(echo $config | jq -r '.base_os.base_name')
-          base_version=$(echo $config | jq -r '.base_os.base_version')
-          base_repo=$(echo $config | jq -r '.base_repo')
-          echo "Base name: $base_name"
-          echo "Base version: $base_version"
-          echo "Base repo: $base_repo"
-          echo "base_name=$base_name" >> $GITHUB_ENV
+          CONFIG_FILE="${{ matrix.image }}/build-config.json"
+          if [[ -f "$CONFIG_FILE" ]]; then
+            base_os=$(jq -r '.base_os.base_name' $CONFIG_FILE)
+            base_version=$(jq -r '.base_os.base_version' $CONFIG_FILE)
+            base_repo=$(jq -r '.base_repo' $CONFIG_FILE)
+          else
+            base_os="el7"
+            base_version="3.6"
+            base_repo="testing"
+          fi
+          echo "base_os=$base_os" >> $GITHUB_ENV
           echo "base_version=$base_version" >> $GITHUB_ENV
           echo "base_repo=$base_repo" >> $GITHUB_ENV
 
-      - name: Build ${{ matrix.image }}:${{ env.base_name }}-${{ env.base_repo }}
-        if: steps.check-jsonfile.conclusion == 'success'
-        continue-on-error: ${{ env.base_repo == 'development' }}
+      - name: Build ${{ matrix.image }}:${{ env.base_version }}-${{ env.base_repo }}
+        continue-on-error: false
         uses: opensciencegrid/build-container-action@v0.6.0
         with:
           osg_series: ${{ env.base_version }}
           osg_repo: ${{ env.base_repo }}
           context: ${{ matrix.image }}
-          base_os: ${{ env.base_name }}
-        env:
-          BASE_NAME: ${{ env.base_name }}
-          BASE_VERSION: ${{ env.base_version }}
-          BASE_REPO: ${{ env.base_repo }}
+          base_os: ${{ env.base_os }}
 
   push:
     runs-on: ubuntu-latest
     if: >-
-      github.ref == 'refs/heads/main' && 
-      github.event_name != 'pull_request' && 
-      github.repository_owner == 'PPathu' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name != 'pull_request' &&
+      github.repository_owner == 'opensciencegrid' &&
       needs.build-image-list.outputs.images != '["dummy"]'
     needs: [make-date-tag, build-image-list, build]
     strategy:
@@ -120,74 +110,26 @@ jobs:
       matrix:
         image: ${{ fromJson(needs.build-image-list.outputs.images) }}
     steps:
-      - name: Push to Harbor (${{ env.base_version }}-development)
-        if: env.base_version != '23'
+      - name: Push to Harbor
+        if: always()
         uses: opensciencegrid/push-container-action@main
         with:
-          repo: development
+          repo: ${{ env.base_repo }}
           osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ env.base_name }}
+          base_os: ${{ env.base_os }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
-      - name: Push to Harbor (${{ env.base_version }}-testing)
+      - name: Push to Docker Hub
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
-          repo: testing
+          repo: ${{ env.base_repo }}
           osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ env.base_name }}
-          registry_url: hub.opensciencegrid.org
-          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
-          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
-
-      - name: Push to Harbor (${{ env.base_version }}-release)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: release
-          osg_series: ${{ env.base_version }}
-          context: ${{ matrix.image }}
-          base_os: ${{ env.base_name }}
-          registry_url: hub.opensciencegrid.org
-          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
-          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
-
-      - name: Push to Docker Hub (${{ env.base_version }}-development)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: development
-          osg_series: ${{ env.base_version }}
-          context: ${{ matrix.image }}
-          base_os: ${{ env.base_name }}
-          registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Push to Docker Hub (${{ env.base_version }}-testing)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: testing
-          osg_series: ${{ env.base_version }}
-          context: ${{ matrix.image }}
-          base_os: ${{ env.base_name }}
-          registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Push to Docker Hub (${{ env.base_version }}-release)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: release
-          osg_series: ${{ env.base_version }}
-          context: ${{ matrix.image }}
-          base_os: ${{ env.base_name }}
+          base_os: ${{ env.base_os }}
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
