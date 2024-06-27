@@ -76,18 +76,18 @@ jobs:
             base_version=$(jq -r '.base_os.base_version[]' $CONFIG_FILE | jq -Rs 'split("\n")[:-1]')
             base_repo=$(jq -r '.base_repo' $CONFIG_FILE)
           else
-            base_os='["el7"]'
-            base_version='["3.6"]'
+            base_os='["el7", "el9"]'
+            base_version='["3.6", "23"]'
             base_repo="testing"
           fi
           matrix=$(jq -n \
             --argjson base_os "$base_os" \
             --argjson base_version "$base_version" \
             --arg base_repo "$base_repo" \
-            '$base_os as $os | $base_version as $version |
-            [
-              ($os | map(. as $o | {base_os: $o})) * ($version | map(. as $v | {base_version: $v})) |
-              .[] | .base_repo = $base_repo
+            '[
+              $base_os[] as $os |
+              $base_version[] as $version |
+              {base_os: $os, base_version: $version, base_repo: $base_repo}
             ]')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
