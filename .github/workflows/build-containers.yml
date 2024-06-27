@@ -78,8 +78,8 @@ jobs:
             mkdir -p "${{ matrix.image }}"
             echo '{' > "${{ matrix.image }}/build-config.json"
             echo '  "base_os": {' >> "${{ matrix.image }}/build-config.json" 
-            echo '    "base_name": "el9",' >> "${{ matrix.image }}/build-config.json" # Default base OS 
-            echo '    "base_version": "23"' >> "${{ matrix.image }}/build-config.json" # Default base OS version
+            echo '    "base_name": "el8",' >> "${{ matrix.image }}/build-config.json" # Default base OS 
+            echo '    "base_version": "3.6"' >> "${{ matrix.image }}/build-config.json" # Default base OS version
             echo '  },' >> "${{ matrix.image }}/build-config.json"
             echo '  "base_repo": "testing"' >> "${{ matrix.image }}/build-config.json" #Default base repo
             echo '}' >> "${{ matrix.image }}/build-config.json"
