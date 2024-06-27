@@ -54,68 +54,54 @@ jobs:
                                       -type d \
                                       -printf "$ORG_DIR/%P\n")
           fi
-
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n")')
           echo "json=$image_json" >> $GITHUB_OUTPUT
 
-  generate-matrix:
-    runs-on: ubuntu-latest
-    needs: build-image-list
-    outputs:
-      matrix: ${{ steps.generate-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Generate build matrix
-        id: generate-matrix
-        run: |
-          CONFIG_FILE="${{ matrix.image }}/build-config.json"
-          if [[ -f "$CONFIG_FILE" ]]; then
-            base_os=$(jq -r '.base_os.base_name[]' $CONFIG_FILE | jq -Rs 'split("\n")[:-1]')
-            base_version=$(jq -r '.base_os.base_version[]' $CONFIG_FILE | jq -Rs 'split("\n")[:-1]')
-            base_repo=$(jq -r '.base_repo' $CONFIG_FILE)
-          else
-            base_os='["el7", "el9"]'
-            base_version='["3.6", "23"]'
-            base_repo="testing"
-          fi
-          matrix=$(jq -n \
-            --argjson base_os "$base_os" \
-            --argjson base_version "$base_version" \
-            --arg base_repo "$base_repo" \
-            '[
-              $base_os[] as $os |
-              $base_version[] as $version |
-              {base_os: $os, base_version: $version, base_repo: $base_repo}
-            ]')
-          echo "Generated matrix: $matrix"
-          echo "::set-output name=matrix::$matrix"
-
   build:
     runs-on: ubuntu-latest
-    needs: [build-image-list, generate-matrix]
+    needs: build-image-list
     if: needs.build-image-list.outputs.images != '["dummy"]'
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
-        config: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+        image: ${{ fromJson(needs.build-image-list.outputs.images) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug matrix
-        run: echo "Matrix: ${{ toJson(matrix.config) }}"
+      - name: Parse build config and set matrix
+        id: set-matrix
+        run: |
+          CONFIG_FILE="${{ matrix.image }}/build-config.json"
+          if [[ -f "$CONFIG_FILE" ]]; then
+            base_os=$(jq -r '.base_os.base_name[]' $CONFIG_FILE | xargs)
+            base_version=$(jq -r '.base_os.base_version[]' $CONFIG_FILE | xargs)
+            base_repo=$(jq -r '.base_repo' $CONFIG_FILE)
+          else
+            base_os="el7 el8"
+            base_version="3.6 23"
+            base_repo="testing"
+          fi
 
-      - name: Build ${{ matrix.config.base_os }}:${{ matrix.config.base_version }}-${{ matrix.config.base_repo }}
+          # Generate matrix combinations
+          matrix=$(jq -n \
+            --argjson base_os "$(jq -n '$ARGS.positional' --args $base_os)" \
+            --argjson base_version "$(jq -n '$ARGS.positional' --args $base_version)" \
+            '[
+              $base_os[] as $os |
+              $base_version[] as $version |
+              {base_os: $os, base_version: $version}
+            ]')
+          echo "matrix=${matrix}" >> $GITHUB_ENV
+
+      - name: Build ${{ matrix.image }}:${{ env.matrix.base_version }}-${{ env.matrix.base_repo }}
         continue-on-error: false
         uses: opensciencegrid/build-container-action@v0.6.0
         with:
-          osg_series: ${{ matrix.config.base_version }}
-          osg_repo: ${{ matrix.config.base_repo }}
+          osg_series: ${{ env.matrix.base_version }}
+          osg_repo: ${{ env.base_repo }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.matrix.base_os }}
 
   push:
     runs-on: ubuntu-latest
@@ -128,100 +114,116 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+        image: ${{ fromJson(needs.build-image-list.outputs.images) }}
     steps:
-      - name: Push to Harbor (${matrix.config.base_version}-${matrix.config.base_repo})
+      - name: Parse build config for push
+        id: parse-config
+        run: |
+          CONFIG_FILE="${{ matrix.image }}/build-config.json"
+          if [[ -f "$CONFIG_FILE" ]]; then
+            base_os=$(jq -r '.base_os.base_name[]' $CONFIG_FILE | xargs)
+            base_version=$(jq -r '.base_os.base_version[]' $CONFIG_FILE | xargs)
+            base_repo=$(jq -r '.base_repo' $CONFIG_FILE)
+          else
+            base_os="el7 el8"
+            base_version="3.6 23"
+            base_repo="testing"
+          fi
+          echo "base_os=$base_os" >> $GITHUB_ENV
+          echo "base_version=$base_version" >> $GITHUB_ENV
+          echo "base_repo=$base_repo" >> $GITHUB_ENV
+
+      - name: Push to Harbor (${env.base_version}-${env.base_repo})
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
-          repo: ${{ matrix.config.base_repo }}
-          osg_series: ${{ matrix.config.base_version }}
+          repo: ${{ env.base_repo }}
+          osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.base_os }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
-      - name: Push to Docker Hub (${matrix.config.base_version}-${matrix.config.base_repo})
+      - name: Push to Docker Hub (${env.base_version}-${env.base_repo})
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
-          repo: ${{ matrix.config.base_repo }}
-          osg_series: ${{ matrix.config.base_version }}
+          repo: ${{ env.base_repo }}
+          osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.base_os }}
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push to Harbor (${{ matrix.config.base_version }}-development)
-        if: ${{ matrix.config.base_version != '23' }}
+      - name: Push to Harbor (${{ env.base_version }}-development)
+        if: ${{ env.base_version != '23' }}
         uses: opensciencegrid/push-container-action@main
         with:
           repo: development
-          osg_series: ${{ matrix.config.base_version }}
+          osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.base_os }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
-      - name: Push to Harbor (${{ matrix.config.base_version }}-testing)
+      - name: Push to Harbor (${{ env.base_version }}-testing)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
           repo: testing
-          osg_series: ${{ matrix.config.base_version }}
+          osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.base_os }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
-      - name: Push to Harbor (${{ matrix.config.base_version }}-release)
+      - name: Push to Harbor (${{ env.base_version }}-release)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
           repo: release
-          osg_series: ${{ matrix.config.base_version }}
+          osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.base_os }}
           registry_url: hub.opensciencegrid.org
           registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
-      - name: Push to Docker Hub (${{ matrix.config.base_version }}-development)
+      - name: Push to Docker Hub (${{ env.base_version }}-development)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
           repo: development
-          osg_series: ${{ matrix.config.base_version }}
+          osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.base_os }}
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push to Docker Hub (${{ matrix.config.base_version }}-testing)
+      - name: Push to Docker Hub (${{ env.base_version }}-testing)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
           repo: testing
-          osg_series: ${{ matrix.config.base_version }}
+          osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.base_os }}
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push to Docker Hub (${{ matrix.config.base_version }}-release)
+      - name: Push to Docker Hub (${{ env.base_version }}-release)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
           repo: release
-          osg_series: ${{ matrix.config.base_version }}
+          osg_series: ${{ env.base_version }}
           context: ${{ matrix.image }}
-          base_os: ${{ matrix.config.base_os }}
+          base_os: ${{ env.base_os }}
           registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+          registry
