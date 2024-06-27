@@ -75,6 +75,9 @@ jobs:
         with:
           fetch-depth: 0
 
+
+           // checks for a build-config.json file in the images directory
+
       - name: Check for build-config.json in ${{ matrix.image }}
         id: check-jsonfile
         run: |
@@ -85,6 +88,8 @@ jobs:
             echo "No build-config.json found in ${{ matrix.image }}"
             echo "config_exists=false" >> $GITHUB_OUTPUT
           fi
+
+          // Logic to read in parameters from the build-config.json and assign the values to new variables
 
       - name: Read build-config.json in ${{ matrix.image }}
         id: read-config
@@ -125,12 +130,16 @@ jobs:
             done
           fi
 
+          // Creates a build matrix to build images based on the parameters read in from the build-config.json
+
       - name: Create build matrix
         id: create-matrix
         if: steps.check-jsonfile.outputs.config_exists == 'true'
         run: |
           matrix=$(jq -c -s '.' matrix.json)
           echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
+
+          // Logic to read in parameters from the build-config.json and assign the values to new variables
 
       - name: Read default-build-config.json
         if: steps.check-jsonfile.outputs.config_exists == 'false'
@@ -170,6 +179,8 @@ jobs:
             done
           fi
 
+          // Logic to read in parameters from the default-build-config.json and assign the values to new variables
+
       - name: Create default build matrix
         id: create-default-matrix
         if: steps.check-jsonfile.outputs.config_exists == 'false'
@@ -177,17 +188,25 @@ jobs:
           matrix_default=$(jq -c -s '.' matrix_default.json)
           echo "image_matrix=$matrix_default" >> $GITHUB_OUTPUT
 
+          // Debug step to read the contents of the build matrix per image for images with build-config.json file
+
       - name: Print build matrix
         if: steps.check-jsonfile.outputs.config_exists == 'true'
         run: |
           echo "Build matrix for build-config.json:"
           cat matrix.json
 
+          // Debug step to read the contents of the build matrix per image for images with default-build-config.json file
+
       - name: Print default build matrix
         if: steps.check-jsonfile.outputs.config_exists == 'false'
         run: |
           echo "Build matrix for default-build-config.json:"
           cat matrix_default.json
+
+          // Logic to trigger workflows for images with the build-config.json file
+          // based on the configuration files per image. 
+          // Triggers either the standard build or repo build workflow.
 
   trigger-builds:
     needs: check-config
@@ -199,6 +218,8 @@ jobs:
     steps:
       - name: Debug build_config
         run: echo ${{ matrix.build_config }}
+
+         // Triggers the standard build workflow
 
       - name: Trigger standard build workflow
         if: ${{ matrix.build_config.build_type == 'standard' }}
@@ -219,6 +240,8 @@ jobs:
             });
             console.log(result);
 
+            // Triggers the repo build workflow
+
       - name: Trigger repo build workflow
         if: ${{ matrix.build_config.build_type == 'repo' }}
         uses: actions/github-script@v4
@@ -238,6 +261,10 @@ jobs:
             });
             console.log(result);
 
+            // Logic to trigger workflows for images with the default-build-config.json file
+            // based on the configuration files per image. 
+            // Triggers either the standard build or repo build workflow.
+
   trigger-default-builds:
     needs: check-config
     runs-on: ubuntu-latest
@@ -246,6 +273,8 @@ jobs:
       matrix:
         build_config: ${{ fromJson(needs.check-config.outputs.default_image_matrix) }}
     steps:
+
+            
 
       - name: Trigger standard build workflow (default)
         if: ${{ matrix.build_config.build_type == 'standard' }}
@@ -265,6 +294,8 @@ jobs:
               }
             });
             console.log(result);
+
+            // Triggers the repo build workflow
 
       - name: Trigger repo build workflow (default)
         if: ${{ matrix.build_config.build_type == 'repo' }}
