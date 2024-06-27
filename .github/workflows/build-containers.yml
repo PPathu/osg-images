@@ -86,14 +86,14 @@ jobs:
 
           # Generate matrix combinations
           matrix=$(jq -n \
-            --argjson base_os "$(jq -n '$ARGS.positional' --args $base_os)" \
-            --argjson base_version "$(jq -n '$ARGS.positional' --args $base_version)" \
+            --argjson base_os "$(jq -nc '$ARGS.positional' --args $base_os)" \
+            --argjson base_version "$(jq -nc '$ARGS.positional' --args $base_version)" \
             '[
               $base_os[] as $os |
               $base_version[] as $version |
               {base_os: $os, base_version: $version}
             ]')
-          echo "matrix=${matrix}" >> $GITHUB_ENV
+          echo "matrix=$matrix" >> $GITHUB_ENV
 
       - name: Set up build matrix
         id: setup-matrix
