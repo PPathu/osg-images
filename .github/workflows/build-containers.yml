@@ -13,6 +13,7 @@ on:
 
 jobs:
   # Job to generate a date tag
+  # Job to generate a date tag
   make-date-tag:
     runs-on: ubuntu-latest 
     outputs:
@@ -22,6 +23,7 @@ jobs:
         id: mkdatetag
         run: echo "dtag=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
 
+  # Job to build the list of images
   # Job to build the list of images
   build-image-list:
     runs-on: ubuntu-latest
@@ -67,15 +69,27 @@ jobs:
                                       -maxdepth 1 \
                                       -type d \
                                       -printf "$ORG_DIR/%P\n")
+               images=$(find $ORG_DIR -mindepth 1 \
+                                      -maxdepth 1 \
+                                      -type d \
+                                      -printf "$ORG_DIR/%P\n")
           fi
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n")')
           echo "json=$image_json" >> $GITHUB_OUTPUT
 
   # Job to check for configuration files and create build matrices
+  # Job to check for configuration files and create build matrices
   check-config:
     runs-on: ubuntu-latest
     needs: [make-date-tag, build-image-list]
+    needs: [make-date-tag, build-image-list]
     outputs:
+      image_matrix: ${{ steps.create-matrix.outputs.image_matrix }}
+      default_image_matrix: ${{ steps.create-default-matrix.outputs.image_matrix }}
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ${{ fromJson(needs.build-image-list.outputs.images) }}
       image_matrix: ${{ steps.create-matrix.outputs.image_matrix }}
       default_image_matrix: ${{ steps.create-default-matrix.outputs.image_matrix }}
     strategy:
@@ -89,6 +103,8 @@ jobs:
 
       # Check if build-config.json exists in the image directory
       - name: Check for build-config.json in ${{ matrix.image }}
+      # Check if build-config.json exists in the image directory
+      - name: Check for build-config.json in ${{ matrix.image }}
         id: check-jsonfile
         run: |
           if [ -f "${{ matrix.image }}/build-config.json" ]; then
@@ -100,7 +116,45 @@ jobs:
 
       # Read and process build-config.json if it exists
       - name: Read build-config.json in ${{ matrix.image }}
+          if [ -f "${{ matrix.image }}/build-config.json" ]; then
+            echo "build-config.json exists in ${{ matrix.image }}"
+            echo "config_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "No build-config.json found in ${{ matrix.image }}"
+            echo "config_exists=false" >> $GITHUB_OUTPUT
+
+      # Read and process build-config.json if it exists
+      - name: Read build-config.json in ${{ matrix.image }}
         id: read-config
+        if: steps.check-jsonfile.outputs.config_exists == 'true'
+        run: |
+          echo "Reading build-config.json for ${{ matrix.image }}"
+          config=$(cat ${{ matrix.image }}/build-config.json)
+          echo "build-config.json content: $config"
+          base_names=$(echo $config | jq -r '.base_os.base_name | join(",")')
+          base_versions=$(echo $config | jq -r '.base_os.base_version | join(",")')
+          base_repo=$(echo $config | jq -r '.base_repo')
+          for base_name in $(echo $base_names | tr "," "\n"); do
+            for base_version in $(echo $base_versions | tr "," "\n"); do
+              echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix.json
+            done
+          done
+          cat matrix.json
+          matrix=$(jq -c -s '.' matrix.json)
+          echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
+
+      # Create the build matrix from build-config.json
+      - name: Create build matrix
+        id: create-matrix
+        if: steps.check-jsonfile.outputs.config_exists == 'true'
+        run: |
+          matrix=$(jq -c -s '.' matrix.json)
+          echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
+
+      # Read default-build-config.json if build-config.json does not exist
+      - name: Read default-build-config.json
+        id: read-default-config
+        if: steps.check-jsonfile.outputs.config_exists == 'false'
         if: steps.check-jsonfile.outputs.config_exists == 'true'
         run: |
           echo "Reading build-config.json for ${{ matrix.image }}"
@@ -336,7 +390,18 @@ jobs:
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+          repo: development
+          osg_series: ${{ matrix.build_config.base_version }}
+          context: ${{ matrix.build_config.image }}
+          base_os: ${{ matrix.build_config.base_name }}
+          registry_url: docker.io
+          registry_user: ${{ secrets.DOCKER_USERNAME }}
+          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Push the built image to Docker Hub testing repository
+      - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-testing)
+        if: always()
+        uses: opensciencegrid/push-container-action@main
       # Push the built image to Docker Hub testing repository
       - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-testing)
         if: always()
@@ -349,7 +414,18 @@ jobs:
           registry_url: docker.io
           registry_user: ${{ secrets.DOCKER_USERNAME }}
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+          repo: testing
+          osg_series: ${{ matrix.build_config.base_version }}
+          context: ${{ matrix.build_config.image }}
+          base_os: ${{ matrix.build_config.base_name }}
+          registry_url: docker.io
+          registry_user: ${{ secrets.DOCKER_USERNAME }}
+          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Push the built image to Docker Hub release repository
+      - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-release)
+        if: always()
+        uses: opensciencegrid/push-container-action@main
       # Push the built image to Docker Hub release repository
       - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-release)
         if: always()
