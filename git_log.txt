@@ -1,0 +1,981 @@
+commit 0e410a21c88e9b6b55aaf95c29e35b76440bd4fa
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 28 14:13:28 2024 -0500
+
+    comment code for PR
+
+commit 68f19d9eeb6798f52f5391dbdfb3ded719451c71
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 17:57:55 2024 -0500
+
+    testing new config for PR with lists
+
+commit b5cc7048d56583f996e69f960a7f0612305d8535
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 17:50:45 2024 -0500
+
+    testing new config for PR with lists
+
+commit cd424241810bc57d5aef7c4b1e8b26561bfbec9b
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 17:41:55 2024 -0500
+
+    testing new config for PR with lists
+
+commit 8c27dc59a5eb287f7ac182e3ccce5d221bdedd0f
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 17:33:52 2024 -0500
+
+    testing new config for PR with lists
+
+commit a16aa0a6466dffcb8238c68b377bc6948d2e3a12
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 17:23:52 2024 -0500
+
+    testing new config for PR with lists
+
+commit 45b26ad94f240a86c0f3895ed597a4cf9cc502d2
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:59:01 2024 -0500
+
+    testing new config for PR with lists
+
+commit 45cd96fb185a03df32e14afafd4d1162bf45e768
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:54:47 2024 -0500
+
+    testing new config for PR with lists
+
+commit 2c435d0396bf76458bf74570eaa1a66ff3e0014d
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:52:25 2024 -0500
+
+    testing new config for PR with lists
+
+commit 3edcfe0b532c732fc4bea8aa17c7017ce034f684
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:47:30 2024 -0500
+
+    testing new config for PR with lists
+
+commit 511cbe1765b5a1dd408183b88136c1cc168de498
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:45:55 2024 -0500
+
+    testing new config for PR with lists
+
+commit a60e2cc0fd7e3f789a66dd0a7821c93493c7194a
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:18:17 2024 -0500
+
+    testing new config for PR with lists
+
+commit d3aa304f08bdb4cddeb3efd5c61bb12820172161
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:17:28 2024 -0500
+
+    testing new config for PR with lists
+
+commit a4c39641b5635eb21bc30a56251eed4a16810e15
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:14:28 2024 -0500
+
+    testing new config for PR with lists
+
+commit d4689ad6e7f5513d6b5cd90191ca569c954e3687
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:13:06 2024 -0500
+
+    testing new config for PR with lists
+
+commit f162dee9eacd4d18f2c49277c5d540269b4108ab
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 16:00:47 2024 -0500
+
+    testing new config for PR with lists
+
+commit 0c75e0b95a04e7ebf7f246d0fca619a5f56dbb0d
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:57:55 2024 -0500
+
+    testing new config for PR with lists
+
+commit 1de04e4632ffa4826df81a03c6038e7cda432116
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:54:41 2024 -0500
+
+    testing new config for PR with lists
+
+commit 19f7279e76c7b0f61b91e736c4bad324fc537cd7
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:47:45 2024 -0500
+
+    testing new config for PR with lists
+
+commit 3a9febe40db6d7f0b9fec5fc707b06a1895087b5
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:44:35 2024 -0500
+
+    testing new config for PR with lists
+
+commit 1caa07e4cc143a9b2c4a622c91e3e4826e093007
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:41:28 2024 -0500
+
+    testing new config for PR with lists
+
+commit 5720555934049606ff0fe5a826de3f05134b2f28
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:35:03 2024 -0500
+
+    testing new config for PR with lists
+
+commit 40aab9951d97bdaf1afd9aac42ef5e4e19241da9
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:30:07 2024 -0500
+
+    testing new config for PR with lists
+
+commit 1f607206e138c13797fe00c9baafb1c833787211
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:26:32 2024 -0500
+
+    testing new config for PR with lists
+
+commit 64e881ac666a463d1638b5e647f68ee3f340f269
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:20:09 2024 -0500
+
+    testing new config for PR with lists
+
+commit 0c0ba02abf2a7326dee0e144be8fce0a2d981547
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:14:37 2024 -0500
+
+    testing new config for PR with lists
+
+commit 20377b862f1f7e4f87bb7b6b0111b4a6b0025bd3
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 15:04:23 2024 -0500
+
+    testing new config for PR
+
+commit 6b525cd17dfc3dd97e107717d6b883130ad140f5
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 14:58:59 2024 -0500
+
+    testing new config for PR
+
+commit e89879787cd208d8b9d80b536d20a31120525974
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 14:57:30 2024 -0500
+
+    testing new config for PR
+
+commit 9ff85aef870878b578c277fff7ce122ca689e4ac
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 13:28:27 2024 -0500
+
+    config file PR test
+
+commit 0a160ed1445c58712017142066e29f437e265e68
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 13:27:02 2024 -0500
+
+    config file PR test
+
+commit e74a8f71ce4c8dd0fc8f2d036ee7e0c19d2f5504
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 13:22:29 2024 -0500
+
+    config file PR test
+
+commit 28accbd55eeb9c9e679fe49fb441242c2a915529
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 13:20:24 2024 -0500
+
+    config file PR test
+
+commit b744ab1c357a12dafabaee93bc69e37b4024b8ad
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 13:14:05 2024 -0500
+
+    config file PR
+
+commit b6ba1f87996d679e7c09361ad2bc767b1db1dba5
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 27 13:09:33 2024 -0500
+
+    save
+
+commit e87ab6f29b1844600d13552ae7ffb8ebbd03567c
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Tue Jun 18 13:50:00 2024 -0500
+
+    named repo workflow
+
+commit 59e706a2383a80517a22128ab33d02505632af28
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Tue Jun 18 13:33:37 2024 -0500
+
+    WORKING workflow triggers, testing repo workflow for build config
+
+commit 67679e3a27a7bc19c44af5a4cc2f5b7b942867e6
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Tue Jun 18 13:30:41 2024 -0500
+
+    WORKING workflow triggers, added way to view build matrices content
+
+commit c5a7180704fcf168b73dccc7d182cb9c5296efd9
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Tue Jun 18 13:21:50 2024 -0500
+
+    WORKING workflow triggers, added way to view build matrices content
+
+commit 9909605c544555bade21c7cae65de202dd02dfe8
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Tue Jun 18 13:15:56 2024 -0500
+
+    WORKING workflow triggers, added way to view build matrices content
+
+commit bdad3acd087694c9b4a8ac259599773719762d75
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Tue Jun 18 13:08:55 2024 -0500
+
+    testing with new trigger jobs and seperated matrices
+
+commit 59b15b25478912f63699266b0ee2213bada1bc36
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 16:02:05 2024 -0500
+
+    testing with new parent default file
+
+commit 3597a96351d6dee8b63ef7303f50e96ac34fa0cf
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 14:59:30 2024 -0500
+
+    testing with added trigger job for defaults with defaults hard coded
+
+commit c2b3ca931e2b2ac353e050a6fd8de26b06233422
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 14:39:52 2024 -0500
+
+    testing with added trigger job for defaults
+
+commit c31733b345a9c88e8b44a3763d81bd39199b31f6
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 14:37:47 2024 -0500
+
+    testing with added trigger job for defaults
+
+commit fc0effeeb9ee0745f4e17a7c0e09ee5299feea12
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 14:22:42 2024 -0500
+
+    testing new implementation
+
+commit af5ac685e37ba26b15ac140de7e3cfe4934ccff8
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 14:11:34 2024 -0500
+
+    testing new implementation
+
+commit 8b6f49c7126bb2f18d7d2b61e4f6338681609b14
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 14:07:17 2024 -0500
+
+    testing new implementation
+
+commit ba61ff80e5a697e8f7b829da1a437baa68998e00
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 12:53:18 2024 -0500
+
+    testing new implementation
+
+commit 94bc454f6fce518f387cde0b10ccf71b40ccd55f
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 12:48:05 2024 -0500
+
+    testing new implementation
+
+commit c9ce2609e72ea3431c9c2544126178376017ff03
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 12:42:55 2024 -0500
+
+    testing new implementation
+
+commit 51c30fd77b986806138fded216d480f2d3b33138
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 12:13:15 2024 -0500
+
+    testing prev code #90 changed repo to true in json
+
+commit 1eaa62625e99c4e6f5d46d000e223e421c2e32af
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 12:09:17 2024 -0500
+
+    testing prev code #90
+
+commit f788ea02c6e73da09a6fa20ff748e999e0dc02e4
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 12:08:07 2024 -0500
+
+    testing prev code #90
+
+commit c156fd2b5439496874f99a4d49560b72bf065e70
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 12:06:58 2024 -0500
+
+    testing prev code #90
+
+commit 6120043071829b02c0c7b5ca370132fd92b86ce7
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 12:03:42 2024 -0500
+
+    testing conditional logic
+
+commit f8af230cbbec0e49cf53edf78f64ec3d97be4d2f
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 11:48:39 2024 -0500
+
+    testing conditional logic after reverting code (true/false)
+
+commit a7b7974e799334862dec35108322c4418a5be824
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 11:43:13 2024 -0500
+
+    testing conditional logic after reverting code (true/true)
+
+commit b66070bcbcc2eda6a27a3af5cf0b08d61d3d51ba
+Author: Pratham Patel <126528354+PPathu@users.noreply.github.com>
+Date:   Mon Jun 17 11:36:36 2024 -0500
+
+    Create repo-build.yml
+
+commit bf0916908e756d7b3d43cb8790a166fdcbdc56c7
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 11:36:57 2024 -0500
+
+    testing conditional logic after reverting code
+
+commit e8297052ec3e4097cfff45cdf24ad791594a5855
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 11:31:37 2024 -0500
+
+    testing conditional logic after reverting code
+
+commit 6e24d73f56fac936c32e3d65a5b43ffab8fd917b
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 11:23:38 2024 -0500
+
+    testing conditional logic in triggers
+
+commit 565587697adf1a0ffea97ba62ff3f82586368200
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 11:20:36 2024 -0500
+
+    testing conditional logic in triggers
+
+commit b6dd5984f0cb6b923bd9de030acf5b799e8c1344
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 17 11:14:02 2024 -0500
+
+    testing conditional logic in triggers
+
+commit f607a9ef56177f24d9cee7679b56d09b9899e8a9
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 16:28:41 2024 -0500
+
+    testing combind jobs
+
+commit 55e822305230a097bca56487eab39592aa870de5
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 16:26:16 2024 -0500
+
+    testing combind jobs
+
+commit 0612164902e5557a65ffb714b21e45667c071487
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 16:23:40 2024 -0500
+
+    testing combind jobs
+
+commit 7753f13daa5fead5d390ac621cdf17fcbe623675
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 16:22:19 2024 -0500
+
+    testing combind jobs
+
+commit e05d030a0ccb2c9f3118e877b6ec83799ae8b9b8
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 16:19:20 2024 -0500
+
+    testing combind jobs
+
+commit 071725c01afb538e4aee4c910bfe4f02b80f9fa8
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 16:15:44 2024 -0500
+
+    testing combind jobs
+
+commit 1867f4040fb923d1d52fc186b361a813ae7771d6
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 16:10:17 2024 -0500
+
+    testing new variables to trigger workflows
+
+commit 79634e94320579915b195a1473ed8dc53c53de41
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 16:04:13 2024 -0500
+
+    testing new variables to trigger workflows
+
+commit 8080248377d5140c3553cb255afcbcab3268b84f
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 14:10:26 2024 -0500
+
+    testing new jobs under workflow triggering
+
+commit ab9f5c8d559a3d320801ea2875322121481dcaea
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 14:06:52 2024 -0500
+
+    testing new jobs under workflow triggering
+
+commit 52611f2396bb14ee01a83a7c93295cb5b4a54de2
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 14:05:01 2024 -0500
+
+    testing new jobs under workflow triggering
+
+commit b09e2ccb08e5a55e6b336cc78cfc8200c83b3626
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 14:00:02 2024 -0500
+
+    testing new jobs under workflow triggering
+
+commit 211eb72235e1bd924db7dcef27d41d2021dd4027
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 13:54:49 2024 -0500
+
+    testing new jobs fortriggering
+
+commit b904cb0ddebac58d4fed7426d0d553ae17d37e21
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 13:52:40 2024 -0500
+
+    testing new jobs fortriggering
+
+commit 98e989bba9073f83c5ac1784596696713a349358
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 13:40:37 2024 -0500
+
+    reverting code
+
+commit 9a1a1d35c3aff83b8fcb0f764f4de97256c83e77
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 13:37:19 2024 -0500
+
+    testing fix to issue regarding not all image builds being triggerd (new logic)
+
+commit 4b2775c11657580cdce261313c0d6be77011287e
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 13:21:26 2024 -0500
+
+    testing fix to issue regarding not all image builds being triggerd (true)
+
+commit 01b24d8510e3c6d427a877e2c6602100817a79ea
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 13:19:31 2024 -0500
+
+    testing fix to issue regarding not all image builds being triggerd
+
+commit 283f5f2673ce2b2a305fbc4c1a973475b77d8e66
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 13:08:18 2024 -0500
+
+    testing fix to issue regarding not all image builds being triggerd
+
+commit 69137bf909f0c2c62760ab0d2ad657874ea84ea6
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:52:16 2024 -0500
+
+    testing trigger issue...again
+
+commit 828a9370309f1da617cf1e2e7e141512e3829f37
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:44:42 2024 -0500
+
+    testing matrix build bug
+
+commit 8406abf41bc1fb8a373c39c7610dc9a76ae67ec0
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:33:20 2024 -0500
+
+    testing matrix build bug
+
+commit 9c7238b0af8db00025a380ae43622f9e23732b4d
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:29:15 2024 -0500
+
+    testing read fix with strings not empty
+
+commit 88452f0bda30ce5c2ffeb854a2d515686428a857
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:28:01 2024 -0500
+
+    testing read fix
+
+commit 4bac9ca97855cf0ff2c4adb86fa1e2870b5fa882
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:24:46 2024 -0500
+
+    testing read fix
+
+commit a5140784835a32a1f4cb212a59cacc60bf148011
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:20:46 2024 -0500
+
+    testing trigger fix
+
+commit 5ac7ecbbb372f459cc00ce521b4f13235509a2fa
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:17:24 2024 -0500
+
+    testing trigger fix
+
+commit 9c2dcf4faaa6f11606434f99d8faa8637ff26da6
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:02:09 2024 -0500
+
+    testing newn implementation
+
+commit 328329ae2bea57fbae2ad62edbf5e57268d1781e
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 12:00:31 2024 -0500
+
+    testing newn implementation
+
+commit 3a90463bc698cd0e95524185813b8b8f274d37af
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 11:52:17 2024 -0500
+
+    testing newn implementation
+
+commit acf513fe1ada3ab86cfc5393be3b664bb98959dd
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 11:42:29 2024 -0500
+
+    reverting code and trying to implement parsing again.
+
+commit b5cbffb4c522435ff6b8cc26fc7ef75838ac5a41
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 11:40:23 2024 -0500
+
+    fixing issues with parsing
+
+commit 6694e51716479742c3779ad71dd3eb364897e277
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Fri Jun 14 11:34:52 2024 -0500
+
+    fixing issues with parsing
+
+commit 8aa9fdb36daf703df371a722ce3f201b0d41746a
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 16:01:52 2024 -0500
+
+    fixing issues with list as parameters
+
+commit d2965340571b8af741a0f1fa5e0e736afb0961c8
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:59:16 2024 -0500
+
+    fixing issues with list as parameters
+
+commit 7e7fd60442db0082124447c3e53f3e647b40e20e
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:58:24 2024 -0500
+
+    fixing issues with list as parameters
+
+commit 9b21ba3a77baff4024d3dd0e94211a692036e6e0
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:51:17 2024 -0500
+
+    testing lists as parameters
+
+commit 7d73e04e69f39c9463febce3bb4cb0e1a06273b9
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:50:04 2024 -0500
+
+    testing lists as parameters
+
+commit e5f5c7bec66c7380e1eab5cdc433947cf62bae2e
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:36:54 2024 -0500
+
+    testing reading in parameters
+
+commit ba72b5817171ab6ec34d0dfa13e2d44e2d555b2c
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:32:54 2024 -0500
+
+    testing reading in parameters
+
+commit cb68f50112982be543ccadf81676c6fb19905461
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:30:29 2024 -0500
+
+    testing reading in parameters
+
+commit 4f3f190bf3f8475a34c9b6883cfeff703dd2b631
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:15:23 2024 -0500
+
+    testing default triggers
+
+commit 147a5e1ff434ce7be021d4e74a312befa9c220ce
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:13:32 2024 -0500
+
+    testing default triggers
+
+commit 78e8050ff05a6f03e3182fd708c209f25eed2d2d
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:12:05 2024 -0500
+
+    testing default triggers
+
+commit 8dc674fa1b2598cc09484b9d8ee86940d086680d
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 15:05:55 2024 -0500
+
+    testing default triggers
+
+commit 482a27ac8ac1b20b1364995412fab9ca27157a0e
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 14:58:27 2024 -0500
+
+    testing trigger mech
+
+commit b89fcd691c1290070c42f10c7a6eede502393428
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 14:54:10 2024 -0500
+
+    testing new logic and flow
+
+commit de3dbfcc916bf87348b854bf9f697963d4f8c618
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 13:43:11 2024 -0500
+
+    testing new logic and flow
+
+commit 99b00eaae3b08bb2b2e1b2096e3ce55f015a53b7
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 13:40:27 2024 -0500
+
+    testing new logic and flow
+
+commit 3ab422d046c8792578f86551a4f5d9ae1f731371
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 13:26:03 2024 -0500
+
+    testing new logic and flow
+
+commit 3b56d10e74981271a0b4621106cf7777bcd0254e
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 13:22:19 2024 -0500
+
+    testing new logic and flow
+
+commit aaf3a61c0c4ec1f2bb5e377a1d0c99cb42c71416
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 13:18:58 2024 -0500
+
+    testing new logic and flow
+
+commit 4bf7405dc999f3cc437acc2d077689dd515e960d
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 12:41:42 2024 -0500
+
+    testing fix to default config build
+
+commit 090d0e9405a37e48285e1cbdf3290dddd5ab7b80
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 12:35:15 2024 -0500
+
+    testing fix to default config build
+
+commit b5c365c6e7bbe3c50fdff40516f649dcb4120778
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 12:30:26 2024 -0500
+
+    testing fix to default config build
+
+commit 151b89343c8c1cce589bb5916daf46ac137a96bf
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 12:23:59 2024 -0500
+
+    testing fix to default config build
+
+commit a8eff8a47a90bfdc9cebc3cb46e222b4fc5cc7a0
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 12:12:12 2024 -0500
+
+    testing fix to push to harbor and docker
+
+commit ca417aa4e6365f6eae3cb93a59d14b13d094dfe2
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 12:03:30 2024 -0500
+
+    testing fix to push to harbor and docker
+
+commit 01393aee16b70432646c9a7def401971f3a0accc
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 11:48:56 2024 -0500
+
+    testing fix to push to harbor and docker
+
+commit 10d76459593590be0a8f0cc9906628335fa8486f
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 11:35:38 2024 -0500
+
+    testing workflow
+
+commit dfb80f41fbd0b753e3ff7cdc132746be43c2fff3
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 11:33:44 2024 -0500
+
+    fixing trigger issue
+
+commit f5db71ed5297554a9b09df439bf62e9dc45284f4
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 11:30:00 2024 -0500
+
+    fixing trigger issue
+
+commit a27d720e5f34227c63f3d4d5256262305bfa9d16
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 13 11:26:12 2024 -0500
+
+    moved push operations to build-containers
+
+commit 35560300a6fdb2180aeeb825ee676ed7a407cb46
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 13:27:12 2024 -0500
+
+    fixing docker push issue
+
+commit 5aa216ccea317cf2baa9a32b3155385cae2cef06
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 13:19:33 2024 -0500
+
+    fixing docker push issue
+
+commit 3a340e836d37f64e02291181d00e7843197b79b7
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 13:15:22 2024 -0500
+
+    fixing docker push issue
+
+commit d648dc6061236e8e4669b0cbb6bcf1414622e10a
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 13:09:21 2024 -0500
+
+    fixing docker push issue and read config issue
+
+commit 6e8725c492b7533f2663d93f5b982affaeb53bb7
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 13:06:36 2024 -0500
+
+    fixing docker push issue and read config issue
+
+commit 934806dfc32d93fefbdf98f689f6f245ed5f8fff
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 12:49:38 2024 -0500
+
+    fixing push to docker issue
+
+commit 6c4318619e9cc8a7b3a886cfad00737ce7033e0c
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 12:37:00 2024 -0500
+
+    fixing config fil path issues
+
+commit 03d74652dfa266e38acf144be404e6d40beb99ae
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 12:19:55 2024 -0500
+
+    fixing config fil path issues
+
+commit 67bc728e0a0c627c5375b1a4ab2534c7c00c8a8f
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 12:13:09 2024 -0500
+
+    fixing config fil path issues
+
+commit e080e5a298ffdd8535bf7cffbd8fd6b79cdcce67
+Merge: 11cdf11 a202240
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 12:11:59 2024 -0500
+
+    Merge branch 'testing-branch' of https://github.com/PPathu/osg-images into testing-branch
+
+commit 11cdf11b84427b3caa0dec9597c7b64cdb2dfe4b
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 12:10:10 2024 -0500
+
+    fixing config fil path issues
+
+commit a20224027fd3f6cc4aea6f4c68a0eb5ffbcd3c62
+Author: Pratham Patel <126528354+PPathu@users.noreply.github.com>
+Date:   Wed Jun 12 11:43:18 2024 -0500
+
+    Create standard-build.yml
+
+commit 36e412766aebf0f7c398ba8a250b10f64c43f799
+Author: Pratham Patel <126528354+PPathu@users.noreply.github.com>
+Date:   Wed Jun 12 11:42:20 2024 -0500
+
+    Delete .github/workflows/standard-build.yml
+
+commit 6158335b041f1ba759e0ff9902e33044fb23e2d7
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 11:39:36 2024 -0500
+
+    trying to get workflow to appear in actions tab
+
+commit 0ab2cfdbfdeae71d3607669377385b168ddb7361
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Wed Jun 12 11:27:21 2024 -0500
+
+    testing first branched workflow
+
+commit 7318ce96ef4e3c6ee8bad56703a0c74c0dd8c260
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 10 15:24:05 2024 -0500
+
+    testing to see if the default parameters function
+
+commit 03bb3c89b2b5d0979540f333995a4b90445e73b6
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 10 11:41:40 2024 -0500
+
+    testing default parameters and config file creation
+
+commit 9cf3b1eed524a53286d0e89f1903603a487327bb
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 10 11:36:53 2024 -0500
+
+    trying to fix config file not found error
+
+commit 64a97015001b9b685c56c99796a12b9ac01e5964
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 10 11:30:32 2024 -0500
+
+    trying to fix EOF error using echo instead
+
+commit 38beaeed84c9334a518d4740e770418f78cca88e
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 10 11:22:27 2024 -0500
+
+    testing EOF error fix
+
+commit 443f0691716c4053ef890adb36339248db4c729b
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 10 10:56:07 2024 -0500
+
+    testing first run of implentations for config file
+
+commit 422fbf4ca3fe0666c0c9bfc28fc95e9a6b4ff6fa
+Merge: 13f4d3c 67685fb
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 6 12:40:40 2024 -0500
+
+    synced fork
+
+commit 13f4d3cf8fba788576ca7374c60a5781bf240624
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 6 12:33:21 2024 -0500
+
+    commented code and fixed image build list
+
+commit 18705f432e1b65aad6bd178f098a73689f7b3d04
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Thu Jun 6 11:40:17 2024 -0500
+
+    fully commented version of code
+
+commit 67685fb3f13ccd0c236cc8a25dc66c66dc5419bc
+Merge: 8edc5ff 96134ee
+Author: Matyas Selmeci <matyas@cs.wisc.edu>
+Date:   Wed Jun 5 09:45:05 2024 -0500
+
+    Merge pull request #188 from brianhlin/move-to-standard-el8-base
+    
+    Move to standard EL8 base
+
+commit 96134ee8bc10c64666c370f1c206a794460c69f3
+Author: Brian Lin <blin@cs.wisc.edu>
+Date:   Wed Jun 5 09:39:57 2024 -0500
+
+    Move to standard EL8 base
+    
+    In preparation for https://github.com/opensciencegrid/docker-software-base/pull/86#issuecomment-2150205743
+
+commit c5993d96415c695fc2e499913def46defff95da9
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Tue Jun 4 13:50:28 2024 -0500
+
+    checking to see if experimental enviornment is properly setup x2
+
+commit 8933e6c933fe26ffe0ccdbe4dff025e49e32840b
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Tue Jun 4 13:49:03 2024 -0500
+
+    checking to see if experimental enviornment is properly setup
+
+commit 8edc5ffd169c757b86e88ae1a92e391923b76384
+Merge: 6d7442b 643ace1
+Author: mwestphall <westphall@wisc.edu>
+Date:   Tue Jun 4 09:04:01 2024 -0500
+
+    Merge pull request #187 from mwestphall/SOFTWARE-5448-squid-container-exit-on-squid-exit
+    
+    SOFTWARE-5448: Exit the supervisord init process if squid exits
+
+commit 81897402596679b3c6bb53794b8ba452fe64b4b5
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 3 16:58:12 2024 -0500
+
+    Add debug step to print generated image list
+
+commit e9a58887d2467a0bd33e435e98e733c4f856b6fb
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 3 16:53:25 2024 -0500
+
+    Add debug step to print generated image list
+
+commit caee1736af9763aaf7d5ed78cb6b60de80b3dfda
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 3 16:42:03 2024 -0500
+
+    testing secrets
+
+commit 643ace1133cfd58ad6eae20afd1e0fd9e0d7222d
+Author: Matthew Westphall <westphall@wisc.edu>
+Date:   Mon Jun 3 15:03:51 2024 -0500
+
+    SOFTWARE-5448: Exit the supervisord init process if squid exits
+
+commit 0437a8e7d066215b640bd7a1569b9cd9f89c2b17
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 3 14:38:17 2024 -0500
+
+    FIXME: Remove unnecessary directories for faster actions
+
+commit bae1269c4608f5089fdeede66f50c7e3be1a68a0
+Author: Pratham Pathel <ppatel74@wisc.edu>
+Date:   Mon Jun 3 14:22:17 2024 -0500
+
+    FIXME: Modify GitHub action to run on testing branch
