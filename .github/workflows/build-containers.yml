@@ -31,14 +31,6 @@ jobs:
       - id: image-list
         run: |
           ORG_DIR=opensciencegrid
-          # Get the list of files changed based on the type of event
-          # kicking off the GHA:
-          # 1. For the main branch, diff the previous state of main vs
-          #    the current commit
-          # 2. For other branches (i.e., on someone's fork), diff main
-          #    vs the current commit
-          # 3. For PRs, diff the base ref vs the current commit
-          # 4. For everything else (e.g., dispatches), build all images
           if [[ $GITHUB_EVENT_NAME == 'pull_request' ]] ||
              [[ $GITHUB_EVENT_NAME == 'push' ]]; then
                if ([[ $GITHUB_EVENT_NAME == 'pull_request' ]]); then
@@ -82,6 +74,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Initialize the combined matrix file
+      - name: Initialize combined matrix
+        run: echo "[]" > combined_matrix.json
+
       # Check if build-config.json exists in the image directory
       - name: Check for build-config.json in ${{ matrix.image }}
         id: check-jsonfile
@@ -99,9 +95,7 @@ jobs:
         id: read-config
         if: steps.check-jsonfile.outputs.config_exists == 'true'
         run: |
-          echo "Reading build-config.json for ${{ matrix.image }}"
           config=$(cat ${{ matrix.image }}/build-config.json)
-          echo "build-config.json content: $config"
           base_names=$(echo $config | jq -r '.base_os.base_name | join(",")')
           base_versions=$(echo $config | jq -r '.base_os.base_version | join(",")')
           base_repo=$(echo $config | jq -r '.base_repo')
@@ -110,26 +104,15 @@ jobs:
               echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix.json
             done
           done
-          cat matrix.json
-          matrix=$(jq -c -s '.' matrix.json)
-          echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
-
-      # Create the build matrix from build-config.json
-      - name: Create build matrix
-        id: create-matrix
-        if: steps.check-jsonfile.outputs.config_exists == 'true'
-        run: |
-          matrix=$(jq -c -s '.' matrix.json)
-          echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
+          jq -s '.[0] + .[1]' combined_matrix.json matrix.json > new_combined_matrix.json
+          mv new_combined_matrix.json combined_matrix.json
 
       # Read default-build-config.json if build-config.json does not exist
       - name: Read default-build-config.json
         id: read-default-config
         if: steps.check-jsonfile.outputs.config_exists == 'false'
         run: |
-          echo "Reading default-build-config.json"
           default_config=$(cat opensciencegrid/default-build-config.json)
-          echo "default-build-config.json content: $default_config"
           base_names=$(echo $default_config | jq -r '.base_os.base_name | join(",")')
           base_versions=$(echo $default_config | jq -r '.base_os.base_version | join(",")')
           base_repo=$(echo $default_config | jq -r '.base_repo')
@@ -138,38 +121,20 @@ jobs:
               echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix_default.json
             done
           done
-          cat matrix_default.json
-          matrix_default=$(jq -c -s '.' matrix_default.json)
-          echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
+          jq -s '.[0] + .[1]' combined_matrix.json matrix_default.json > new_combined_matrix.json
+          mv new_combined_matrix.json combined_matrix.json
 
-      # Create the default build matrix from default-build-config.json
-      - name: Create default build matrix
-        id: create-default-matrix
-        if: steps.check-jsonfile.outputs.config_exists == 'false'
-        run: |
-          matrix_default=$(jq -c -s '.' matrix_default.json)
-          echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
-
-      # Combine the matrices
+      # Combine all matrices
       - name: Combine matrices
         id: combine-matrix
         run: |
-          image_matrix=${{ steps.create-matrix.outputs.image_matrix }}
-          default_image_matrix=${{ steps.create-default-matrix.outputs.default_image_matrix }}
-          if [ -n "$image_matrix" ] && [ "$image_matrix" != "[]" ]; then
-            combined_matrix=$image_matrix
-          else
-            combined_matrix=$default_image_matrix
-          fi
-          echo "Combined matrix: $combined_matrix"
+          combined_matrix=$(cat combined_matrix.json)
           echo "combined_matrix=$combined_matrix" >> $GITHUB_OUTPUT
 
   # Job to trigger builds for all configurations
   trigger-builds:
     needs: check-config
     runs-on: ubuntu-latest
-    if: needs.build-image-list.outputs.images != '["dummy"]'
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
