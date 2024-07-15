@@ -74,7 +74,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Initialize the combined matrix file
+      # Initialize the combined matrix file as an empty array
       - name: Initialize combined matrix
         run: echo "[]" > combined_matrix.json
 
@@ -88,7 +88,6 @@ jobs:
           else
             echo "No build-config.json found in ${{ matrix.image }}"
             echo "config_exists=false" >> $GITHUB_OUTPUT
-          fi
 
       # Read and process build-config.json if it exists
       - name: Read build-config.json in ${{ matrix.image }}
@@ -99,11 +98,19 @@ jobs:
           base_names=$(echo $config | jq -r '.base_os.base_name | join(",")')
           base_versions=$(echo $config | jq -r '.base_os.base_version | join(",")')
           base_repo=$(echo $config | jq -r '.base_repo')
+          echo "[" > matrix.json
+          first=true
           for base_name in $(echo $base_names | tr "," "\n"); do
             for base_version in $(echo $base_versions | tr "," "\n"); do
+              if [ "$first" = true ]; then
+                first=false
+              else
+                echo "," >> matrix.json
+              fi
               echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix.json
             done
           done
+          echo "]" >> matrix.json
           jq -s '.[0] + .[1]' combined_matrix.json matrix.json > new_combined_matrix.json
           mv new_combined_matrix.json combined_matrix.json
 
@@ -116,11 +123,19 @@ jobs:
           base_names=$(echo $default_config | jq -r '.base_os.base_name | join(",")')
           base_versions=$(echo $default_config | jq -r '.base_os.base_version | join(",")')
           base_repo=$(echo $default_config | jq -r '.base_repo')
+          echo "[" > matrix_default.json
+          first=true
           for base_name in $(echo $base_names | tr "," "\n"); do
             for base_version in $(echo $base_versions | tr "," "\n"); do
+              if [ "$first" = true ]; then
+                first=false
+              else
+                echo "," >> matrix_default.json
+              fi
               echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix_default.json
             done
           done
+          echo "]" >> matrix_default.json
           jq -s '.[0] + .[1]' combined_matrix.json matrix_default.json > new_combined_matrix.json
           mv new_combined_matrix.json combined_matrix.json
 
