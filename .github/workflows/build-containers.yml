@@ -130,7 +130,7 @@ jobs:
           done
           cat matrix_default.json
           matrix_default=$(jq -c -s '.' matrix_default.json)
-          echo "image_matrix=$matrix_default" >> $GITHUB_OUTPUT
+          echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
 
       # Create the default build matrix from default-build-config.json
       - name: Create default build matrix
@@ -138,7 +138,7 @@ jobs:
         if: steps.check-jsonfile.outputs.config_exists == 'false'
         run: |
           matrix_default=$(jq -c -s '.' matrix_default.json)
-          echo "image_matrix=$matrix_default" >> $GITHUB_OUTPUT
+          echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
 
   # Job to trigger builds for each configuration in the image matrix
   trigger-builds:
@@ -148,7 +148,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build_config: ${{ fromJson(needs.check-config.outputs.image_matrix) }}
+        config_type: [image_matrix, default_image_matrix]
+        build_config: ${{ fromJson(needs.check-config.outputs[config_type]) }}
     steps:
       - name: Debug build_config
         run: echo ${{ matrix.build_config }}
