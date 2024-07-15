@@ -194,6 +194,13 @@ jobs:
             
             # Build the image
             echo "::group::Building $image:$base_name-$base_repo"
+            echo "Using configuration:"
+            echo "Image: $image"
+            echo "Base Name: $base_name"
+            echo "Base Version: $base_version"
+            echo "Base Repo: $base_repo"
+            
+            # Build the image
             uses: opensciencegrid/build-container-action@v0.6.0
             with:
               osg_series: $base_version
