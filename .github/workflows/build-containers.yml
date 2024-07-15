@@ -65,7 +65,7 @@ jobs:
     needs: [make-date-tag, build-image-list]
     outputs:
       image_matrix: ${{ steps.create-matrix.outputs.image_matrix }}
-      default_image_matrix: ${{ steps.create-default-matrix.outputs.image_matrix }}
+      default_image_matrix: ${{ steps.create-default-matrix.outputs.default_image_matrix }}
     strategy:
       fail-fast: false
       matrix:
@@ -124,7 +124,7 @@ jobs:
           base_versions=$(echo $default_config | jq -r '.base_os.base_version | join(",")')
           base_repo=$(echo $default_config | jq -r '.base_repo')
           for base_name in $(echo $base_names | tr "," "\n"); do
-            for base_version in $(echo $base_versions | tr "," "\n"); do
+            for base_version in $(echo the base_versions | tr "," "\n"); do
               echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix_default.json
             done
           done
@@ -140,16 +140,18 @@ jobs:
           matrix_default=$(jq -c -s '.' matrix_default.json)
           echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
 
-  # Job to trigger builds for each configuration in the image matrix
+  # Job to trigger builds for each configuration in both matrices
   trigger-builds:
     needs: check-config
     runs-on: ubuntu-latest
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
-        config_type: [image_matrix, default_image_matrix]
-        build_config: ${{ fromJson(needs.check-config.outputs[config_type]) }}
+        include:
+          - build_config: ${{ fromJson(needs.check-config.outputs.image_matrix) }}
+            config_type: "image_matrix"
+          - build_config: ${{ fromJson(needs.check-config.outputs.default_image_matrix) }}
+            config_type: "default_image_matrix"
     steps:
       - name: Debug build_config
         run: echo ${{ matrix.build_config }}
