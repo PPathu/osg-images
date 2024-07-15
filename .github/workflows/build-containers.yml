@@ -150,7 +150,10 @@ jobs:
       - name: Combine matrices
         id: combine
         run: |
-          echo $(jq -c -s '.[0] + .[1]' <<<"${{ needs.check-config.outputs.image_matrix }} ${{ needs.check-config.outputs.default_image_matrix }}") > combined_matrix.json
+          image_matrix=${{ needs.check-config.outputs.image_matrix }}
+          default_image_matrix=${{ needs.check-config.outputs.default_image_matrix }}
+          combined_matrix=$(jq -c -s '.[0] + .[1]' <<<"$image_matrix $default_image_matrix")
+          echo "$combined_matrix" > combined_matrix.json
           cat combined_matrix.json
           echo "combined_matrix=$(cat combined_matrix.json)" >> $GITHUB_OUTPUT
 
