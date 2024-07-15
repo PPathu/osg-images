@@ -59,12 +59,12 @@ jobs:
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n")')
           echo "json=$image_json" >> $GITHUB_OUTPUT
 
-  # Job to check for configuration files and create build matrices
+  # Job to check for configuration files and create individual matrices
   check-config:
     runs-on: ubuntu-latest
     needs: [make-date-tag, build-image-list]
     outputs:
-      combined_matrix: ${{ steps.combine-matrix.outputs.combined_matrix }}
+      image_matrices: ${{ steps.collect-matrices.outputs.image_matrices }}
     strategy:
       fail-fast: false
       matrix:
@@ -74,9 +74,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Initialize the combined matrix file as an empty array
-      - name: Initialize combined matrix
-        run: echo "[]" > combined_matrix.json
+      - name: Initialize image matrices
+        id: init-matrices
+        run: echo "[]" > image_matrices.json
 
       # Check if build-config.json exists in the image directory
       - name: Check for build-config.json in ${{ matrix.image }}
@@ -112,8 +112,8 @@ jobs:
             done
           done
           echo "]" >> matrix.json
-          jq -s '.[0] + .[1]' combined_matrix.json matrix.json > new_combined_matrix.json
-          mv new_combined_matrix.json combined_matrix.json
+          jq -s '.[0] + .[1]' image_matrices.json matrix.json > new_image_matrices.json
+          mv new_image_matrices.json image_matrices.json
 
       # Read default-build-config.json if build-config.json does not exist
       - name: Read default-build-config.json
@@ -137,25 +137,38 @@ jobs:
             done
           done
           echo "]" >> matrix_default.json
-          jq -s '.[0] + .[1]' combined_matrix.json matrix_default.json > new_combined_matrix.json
-          mv new_combined_matrix.json combined_matrix.json
+          jq -s '.[0] + .[1]' image_matrices.json matrix_default.json > new_image_matrices.json
+          mv new_image_matrices.json image_matrices.json
 
-      # Combine all matrices
+      - name: Collect matrices
+        id: collect-matrices
+        run: |
+          image_matrices=$(cat image_matrices.json | jq -c .)
+          echo "image_matrices=$image_matrices" >> $GITHUB_OUTPUT
+          echo "::set-output name=image_matrices::$image_matrices"
+
+  # Job to combine matrices
+  combine-matrices:
+    runs-on: ubuntu-latest
+    needs: [check-config]
+    outputs:
+      combined_matrix: ${{ steps.combine-matrix.outputs.combined_matrix }}
+    steps:
       - name: Combine matrices
         id: combine-matrix
         run: |
-          combined_matrix=$(cat combined_matrix.json | jq -c .)
+          combined_matrix=${{ needs.check-config.outputs.image_matrices }}
           echo "combined_matrix=$combined_matrix" >> $GITHUB_OUTPUT
           echo "::set-output name=combined_matrix::$combined_matrix"
 
   # Job to trigger builds for all configurations
   trigger-builds:
-    needs: check-config
+    needs: combine-matrices
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        build_config: ${{ fromJson(needs.check-config.outputs.combined_matrix) }}
+        build_config: ${{ fromJson(needs.combine-matrices.outputs.combined_matrix) }}
     steps:
       - name: Debug build_config
         run: echo ${{ matrix.build_config }}
