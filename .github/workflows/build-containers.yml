@@ -156,11 +156,12 @@ jobs:
         run: |
           image_matrix=${{ steps.create-matrix.outputs.image_matrix }}
           default_image_matrix=${{ steps.create-default-matrix.outputs.default_image_matrix }}
-          if [ -n "$image_matrix" ]; then
+          if [ -n "$image_matrix" ] && [ "$image_matrix" != "[]" ]; then
             combined_matrix=$image_matrix
           else
             combined_matrix=$default_image_matrix
           fi
+          echo "Combined matrix: $combined_matrix"
           echo "combined_matrix=$combined_matrix" >> $GITHUB_OUTPUT
 
   # Job to trigger builds for all configurations
