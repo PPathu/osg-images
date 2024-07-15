@@ -160,112 +160,130 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ${{ fromJson(needs.build-image-list.outputs.images) }}
+        config_type: [image_matrix, default_image_matrix]
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      # Determine which matrix to use
-      - name: Determine build matrix
-        id: determine-matrix
+      - name: Set up build matrix
+        id: setup-matrix
         run: |
-          if [ -f "${{ matrix.image }}/build-config.json" ]; then
+          if [[ "${{ matrix.config_type }}" == "image_matrix" ]]; then
             echo "matrix=$(needs.check-config.outputs.image_matrix)" >> $GITHUB_ENV
           else
             echo "matrix=$(needs.check-config.outputs.default_image_matrix)" >> $GITHUB_ENV
           fi
 
+      - name: Parse matrix
+        id: parse-matrix
+        run: echo ${{ env.matrix }} | jq -c '.[]' > build_matrix.json
+
       - name: Debug build_config
-        run: echo ${{ fromJson(env.matrix) }}
+        run: cat build_matrix.json
 
-      # Build the image with the specified configuration
       - name: Build
-        uses: opensciencegrid/build-container-action@v0.6.0
+        uses: actions/checkout@v3
         with:
-          osg_series: ${{ fromJson(env.matrix).base_version }}
-          osg_repo: ${{ fromJson(env.matrix).base_repo }}
-          context: ${{ fromJson(env.matrix).image }}
-          base_os: ${{ fromJson(env.matrix).base_name }}
-        env:
-          BASE_NAME: ${{ fromJson(env.matrix).base_name }}
-          BASE_VERSION: ${{ fromJson(env.matrix).base_version }}
-          BASE_REPO: ${{ fromJson(env.matrix).base_repo }}
+          fetch-depth: 0
 
-      # Push the built image to Harbor development repository
-      - name: Push to Harbor (development)
-        if: fromJson(env.matrix).base_version != '23'
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: development
-          osg_series: ${{ fromJson(env.matrix).base_version }}
-          context: ${{ fromJson(env.matrix).image }}
-          base_os: ${{ fromJson(env.matrix).base_name }}
-          registry_url: hub.opensciencegrid.org
-          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
-          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+      - name: Build and Push
+        run: |
+          while IFS= read -r line; do
+            build_config=$(echo "$line" | jq -r '.')
+            image=$(echo "$build_config" | jq -r '.image')
+            base_name=$(echo "$build_config" | jq -r '.base_name')
+            base_version=$(echo "$build_config" | jq -r '.base_version')
+            base_repo=$(echo "$build_config" | jq -r '.base_repo')
+            
+            # Build the image
+            echo "::group::Building $image:$base_name-$base_repo"
+            uses: opensciencegrid/build-container-action@v0.6.0
+            with:
+              osg_series: $base_version
+              osg_repo: $base_repo
+              context: $image
+              base_os: $base_name
+            env:
+              BASE_NAME: $base_name
+              BASE_VERSION: $base_version
+              BASE_REPO: $base_repo
+            echo "::endgroup::"
 
-      # Push the built image to Harbor testing repository
-      - name: Push to Harbor (testing)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: testing
-          osg_series: ${{ fromJson(env.matrix).base_version }}
-          context: ${{ fromJson(env.matrix).image }}
-          base_os: ${{ fromJson(env.matrix).base_name }}
-          registry_url: hub.opensciencegrid.org
-          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
-          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+            # Push the built image to Harbor development repository
+            echo "::group::Pushing to Harbor ($base_version-development)"
+            if [ "$base_version" != "23" ]; then
+              uses: opensciencegrid/push-container-action@main
+              with:
+                repo: development
+                osg_series: $base_version
+                context: $image
+                base_os: $base_name
+                registry_url: hub.opensciencegrid.org
+                registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+                registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+            fi
+            echo "::endgroup::"
 
-      # Push the built image to Harbor release repository
-      - name: Push to Harbor (release)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: release
-          osg_series: ${{ fromJson(env.matrix).base_version }}
-          context: ${{ fromJson(env.matrix).image }}
-          base_os: ${{ fromJson(env.matrix).base_name }}
-          registry_url: hub.opensciencegrid.org
-          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
-          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+            # Push the built image to Harbor testing repository
+            echo "::group::Pushing to Harbor ($base_version-testing)"
+            uses: opensciencegrid/push-container-action@main
+            with:
+              repo: testing
+              osg_series: $base_version
+              context: $image
+              base_os: $base_name
+              registry_url: hub.opensciencegrid.org
+              registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+              registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+            echo "::endgroup::"
 
-      # Push the built image to Docker Hub development repository
-      - name: Push to Docker Hub (development)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: development
-          osg_series: ${{ fromJson(env.matrix).base_version }}
-          context: ${{ fromJson(env.matrix).image }}
-          base_os: ${{ fromJson(env.matrix).base_name }}
-          registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+            # Push the built image to Harbor release repository
+            echo "::group::Pushing to Harbor ($base_version-release)"
+            uses: opensciencegrid/push-container-action@main
+            with:
+              repo: release
+              osg_series: $base_version
+              context: $image
+              base_os: $base_name
+              registry_url: hub.opensciencegrid.org
+              registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+              registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+            echo "::endgroup::"
 
-      # Push the built image to Docker Hub testing repository
-      - name: Push to Docker Hub (testing)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: testing
-          osg_series: ${{ fromJson(env.matrix).base_version }}
-          context: ${{ fromJson(env.matrix).image }}
-          base_os: ${{ fromJson(env.matrix).base_name }}
-          registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+            # Push the built image to Docker Hub development repository
+            echo "::group::Pushing to Docker Hub ($base_version-development)"
+            uses: opensciencegrid/push-container-action@main
+            with:
+              repo: development
+              osg_series: $base_version
+              context: $image
+              base_os: $base_name
+              registry_url: docker.io
+              registry_user: ${{ secrets.DOCKER_USERNAME }}
+              registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+            echo "::endgroup::"
 
-      # Push the built image to Docker Hub release repository
-      - name: Push to Docker Hub (release)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: release
-          osg_series: ${{ fromJson(env.matrix).base_version }}
-          context: ${{ fromJson(env.matrix).image }}
-          base_os: ${{ fromJson(env.matrix).base_name }}
-          registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+            # Push the built image to Docker Hub testing repository
+            echo "::group::Pushing to Docker Hub ($base_version-testing)"
+            uses: opensciencegrid/push-container-action@main
+            with:
+              repo: testing
+              osg_series: $base_version
+              context: $image
+              base_os: $base_name
+              registry_url: docker.io
+              registry_user: ${{ secrets.DOCKER_USERNAME }}
+              registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+            echo "::endgroup::"
+
+            # Push the built image to Docker Hub release repository
+            echo "::group::Pushing to Docker Hub ($base_version-release)"
+            uses: opensciencegrid/push-container-action@main
+            with:
+              repo: release
+              osg_series: $base_version
+              context: $image
+              base_os: $base_name
+              registry_url: docker.io
+              registry_user: ${{ secrets.DOCKER_USERNAME }}
+              registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+            echo "::endgroup::"
+
+          done < build_matrix.json
