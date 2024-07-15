@@ -161,6 +161,10 @@ jobs:
   trigger-builds:
     needs: combine-matrices
     runs-on: ubuntu-latest
+    if: needs.build-image-list.outputs.images != '["dummy"]'
+   # Prevent a single build failure from killing the workflow.
+   # This is safe since subsequent pushes should fail on cache load
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
