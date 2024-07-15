@@ -150,8 +150,8 @@ jobs:
       - name: Combine matrices
         id: combine
         run: |
-          image_matrix=${{ needs.check-config.outputs.image_matrix }}
-          default_image_matrix=${{ needs.check-config.outputs.default_image_matrix }}
+          image_matrix='${{ needs.check-config.outputs.image_matrix }}'
+          default_image_matrix='${{ needs.check-config.outputs.default_image_matrix }}'
           combined_matrix=$(jq -c -s '.[0] + .[1]' <<<"$image_matrix $default_image_matrix")
           echo "$combined_matrix" > combined_matrix.json
           cat combined_matrix.json
