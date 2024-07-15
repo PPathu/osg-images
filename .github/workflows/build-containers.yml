@@ -160,12 +160,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config_type: [image_matrix, default_image_matrix]
+        image: ${{ fromJson(needs.build-image-list.outputs.images) }}
     steps:
-      - name: Set up build matrix
-        id: setup-matrix
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # Determine which matrix to use
+      - name: Determine build matrix
+        id: determine-matrix
         run: |
-          if [[ "${{ matrix.config_type }}" == "image_matrix" ]]; then
+          if [ -f "${{ matrix.image }}/build-config.json" ]; then
             echo "matrix=$(needs.check-config.outputs.image_matrix)" >> $GITHUB_ENV
           else
             echo "matrix=$(needs.check-config.outputs.default_image_matrix)" >> $GITHUB_ENV
@@ -175,7 +180,7 @@ jobs:
         run: echo ${{ fromJson(env.matrix) }}
 
       # Build the image with the specified configuration
-      - name: Build ${{ fromJson(env.matrix).image }}:${{ fromJson(env.matrix).base_name }}-${{ fromJson(env.matrix).base_repo }}
+      - name: Build
         uses: opensciencegrid/build-container-action@v0.6.0
         with:
           osg_series: ${{ fromJson(env.matrix).base_version }}
@@ -188,7 +193,7 @@ jobs:
           BASE_REPO: ${{ fromJson(env.matrix).base_repo }}
 
       # Push the built image to Harbor development repository
-      - name: Push to Harbor (${{ fromJson(env.matrix).base_version }}-development)
+      - name: Push to Harbor (development)
         if: fromJson(env.matrix).base_version != '23'
         uses: opensciencegrid/push-container-action@main
         with:
@@ -201,7 +206,7 @@ jobs:
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
       # Push the built image to Harbor testing repository
-      - name: Push to Harbor (${{ fromJson(env.matrix).base_version }}-testing)
+      - name: Push to Harbor (testing)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
@@ -214,7 +219,7 @@ jobs:
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
       # Push the built image to Harbor release repository
-      - name: Push to Harbor (${{ fromJson(env.matrix).base_version }}-release)
+      - name: Push to Harbor (release)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
@@ -227,7 +232,7 @@ jobs:
           registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
 
       # Push the built image to Docker Hub development repository
-      - name: Push to Docker Hub (${{ fromJson(env.matrix).base_version }}-development)
+      - name: Push to Docker Hub (development)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
@@ -240,7 +245,7 @@ jobs:
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
 
       # Push the built image to Docker Hub testing repository
-      - name: Push to Docker Hub (${{ fromJson(env.matrix).base_version }}-testing)
+      - name: Push to Docker Hub (testing)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
@@ -253,7 +258,7 @@ jobs:
           registry_pass: ${{ secrets.DOCKER_PASSWORD }}
 
       # Push the built image to Docker Hub release repository
-      - name: Push to Docker Hub (${{ fromJson(env.matrix).base_version }}-release)
+      - name: Push to Docker Hub (release)
         if: always()
         uses: opensciencegrid/push-container-action@main
         with:
