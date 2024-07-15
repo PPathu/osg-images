@@ -158,7 +158,7 @@ jobs:
             echo "combined_matrix=${{ steps.create-matrix.outputs.image_matrix }}" >> $GITHUB_OUTPUT
           else
             echo "combined_matrix=${{ steps.create-default-matrix.outputs.default_image_matrix }}" >> $GITHUB_OUTPUT
-          
+          fi
   # Job to trigger builds for all configurations
   trigger-builds:
     needs: check-config
