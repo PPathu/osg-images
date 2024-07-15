@@ -144,8 +144,9 @@ jobs:
       - name: Combine matrices
         id: combine-matrix
         run: |
-          combined_matrix=$(cat combined_matrix.json)
+          combined_matrix=$(cat combined_matrix.json | jq -c .)
           echo "combined_matrix=$combined_matrix" >> $GITHUB_OUTPUT
+          echo "::set-output name=combined_matrix::$combined_matrix"
 
   # Job to trigger builds for all configurations
   trigger-builds:
