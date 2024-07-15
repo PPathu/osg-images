@@ -147,11 +147,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - build_config: ${{ fromJson(needs.check-config.outputs.image_matrix) }}
-            config_type: "image_matrix"
-          - build_config: ${{ fromJson(needs.check-config.outputs.default_image_matrix) }}
-            config_type: "default_image_matrix"
+        build_config: ${{ fromJson(needs.check-config.outputs.image_matrix) }}${{ fromJson(needs.check-config.outputs.default_image_matrix) }}
     steps:
       - name: Debug build_config
         run: echo ${{ matrix.build_config }}
