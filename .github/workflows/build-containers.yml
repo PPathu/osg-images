@@ -124,7 +124,7 @@ jobs:
           base_versions=$(echo $default_config | jq -r '.base_os.base_version | join(",")')
           base_repo=$(echo $default_config | jq -r '.base_repo')
           for base_name in $(echo $base_names | tr "," "\n"); do
-            for base_version in $(echo the base_versions | tr "," "\n"); do
+            for base_version in $(echo $base_versions | tr "," "\n"); do
               echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix_default.json
             done
           done
