@@ -154,12 +154,13 @@ jobs:
       - name: Combine matrices
         id: combine-matrix
         run: |
-          if [ -n "${{ steps.create-matrix.outputs.image_matrix }}" ]; then
-            echo "${{ steps.create-matrix.outputs.image_matrix }}" > combined_matrix.json
+          image_matrix=${{ steps.create-matrix.outputs.image_matrix }}
+          default_image_matrix=${{ steps.create-default-matrix.outputs.default_image_matrix }}
+          if [ -n "$image_matrix" ]; then
+            combined_matrix=$image_matrix
           else
-            echo "${{ steps.create-default-matrix.outputs.default_image_matrix }}" > combined_matrix.json
+            combined_matrix=$default_image_matrix
           fi
-          combined_matrix=$(cat combined_matrix.json)
           echo "combined_matrix=$combined_matrix" >> $GITHUB_OUTPUT
 
   # Job to trigger builds for all configurations
