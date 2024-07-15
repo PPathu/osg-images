@@ -1,265 +1,267 @@
-name: Main Workflow
-
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
-  repository_dispatch:
-    types: [dispatch-build]
-
-jobs:
-  # Job to generate a date tag
-  make-date-tag:
-    runs-on: ubuntu-latest 
-    outputs:
-      dtag: ${{ steps.mkdatetag.outputs.dtag }}
-    steps:
-      - name: make date tag
-        id: mkdatetag
-        run: echo "dtag=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
-
-  # Job to build the list of images
-  build-image-list:
-    runs-on: ubuntu-latest
-    outputs:
-      images: ${{ steps.image-list.outputs.json }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - id: image-list
-        run: |
-          ORG_DIR=opensciencegrid
-          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]] ||
-             [[ $GITHUB_EVENT_NAME == 'push' ]]; then
-               if ([[ $GITHUB_EVENT_NAME == 'pull_request' ]]); then
-                   BASE=$(git merge-base origin/$GITHUB_BASE_REF HEAD)
-               elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
-                   BASE=${{ github.event.before }}
-               else
-                   BASE=origin/main
-               fi
-               images=$(git diff --name-only \
-                                 "$BASE" \
-                                 "$GITHUB_SHA" |
-                        egrep "^$ORG_DIR/" |
-                        cut -d/ -f -2 |
-                        sort |
-                        uniq |
-                        xargs -I {} find . -type d \
-                                           -wholename ./{} \
-                                           -printf "%P\n")
-          else
-               images=$(find $ORG_DIR -mindepth 1 \
-                                      -maxdepth 1 \
-                                      -type d \
-                                      -printf "$ORG_DIR/%P\n")
-          fi
-          image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n")')
-          echo "json=$image_json" >> $GITHUB_OUTPUT
-
-  # Job to check for configuration files and create build matrices
-  check-config:
-    runs-on: ubuntu-latest
-    needs: [make-date-tag, build-image-list]
-    outputs:
-      image_matrix: ${{ steps.create-matrix.outputs.image_matrix }}
-      default_image_matrix: ${{ steps.create-default-matrix.outputs.default_image_matrix }}
-    strategy:
-      fail-fast: false
-      matrix:
-        image: ${{ fromJson(needs.build-image-list.outputs.images) }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      # Check if build-config.json exists in the image directory
-      - name: Check for build-config.json in ${{ matrix.image }}
-        id: check-jsonfile
-        run: |
-          if [ -f "${{ matrix.image }}/build-config.json" ]; then
-            echo "build-config.json exists in ${{ matrix.image }}"
-            echo "config_exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "No build-config.json found in ${{ matrix.image }}"
-            echo "config_exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      # Read and process build-config.json if it exists
-      - name: Read build-config.json in ${{ matrix.image }}
-        id: read-config
-        if: steps.check-jsonfile.outputs.config_exists == 'true'
-        run: |
-          config=$(cat ${{ matrix.image }}/build-config.json)
-          base_names=$(echo $config | jq -r '.base_os.base_name | join(",")')
-          base_versions=$(echo $config | jq -r '.base_os.base_version | join(",")')
-          base_repo=$(echo $config | jq -r '.base_repo')
-          for base_name in $(echo $base_names | tr "," "\n"); do
-            for base_version in $(echo $base_versions | tr "," "\n"); do
-              echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix.json
+---
+  name: Build and push container images
+  
+  on:
+    push:
+    pull_request:
+    workflow_dispatch:
+    repository_dispatch:
+      types: [dispatch-build]
+  
+  jobs:
+    make-date-tag:
+      runs-on: ubuntu-latest
+      outputs:
+        dtag: ${{ steps.mkdatetag.outputs.dtag }}
+      steps:
+        - name: make date tag
+          id: mkdatetag
+          run: echo "dtag=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
+  
+    build-image-list:
+      runs-on: ubuntu-latest
+      outputs:
+        images: ${{ steps.image-list.outputs.json }}
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+  
+        - id: image-list
+          run: |
+            ORG_DIR=opensciencegrid
+            # Get the list of files changed based on the type of event
+            # kicking off the GHA:
+            # 1. For the main branch, diff the previous state of main vs
+            #    the current commit
+            # 2. For other branches (i.e., on someone's fork), diff main
+            #    vs the current commit
+            # 3. For PRs, diff the base ref vs the current commit
+            # 4. For everything else (e.g., dispatches), build all images
+            if [[ $GITHUB_EVENT_NAME == 'pull_request' ]] ||
+               [[ $GITHUB_EVENT_NAME == 'push' ]]; then
+                 if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
+                     BASE=$(git merge-base origin/$GITHUB_BASE_REF HEAD)
+                 elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
+                     BASE=${{github.event.before}}
+                 else
+                     BASE=origin/main
+                 fi
+                 # List image root dirs where files have changed and the
+                 # root dir exists. Example value:
+                 # "opensciencegrid/vo-frontend opensciencegrid/ospool-cm"
+                 images=$(git diff --name-only \
+                                   "$BASE" \
+                                   "$GITHUB_SHA" |
+                          egrep "^$ORG_DIR/" |
+                          cut -d/ -f -2 |
+                          sort |
+                          uniq |
+                          xargs -I {} find . -type d \
+                                             -wholename ./{} \
+                                             -printf "%P\n")
+            else
+                 # List all image root dirs. Example value:
+                 # "opensciencegrid/vo-frontend opensciencegrid/ospool-cm"
+                 images=$(find $ORG_DIR -mindepth 1 \
+                                        -maxdepth 1 \
+                                        -type d \
+                                        -printf "$ORG_DIR/%P\n")
+            fi
+  
+            # Ensure that the generated JSON array has a member,
+            # otherwise GHA will throw an error about an empty matrix
+            # vector in subsequent steps
+            image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n")')
+            echo "json=$image_json" >> $GITHUB_OUTPUT
+  
+    check-config:
+      runs-on: ubuntu-latest
+      needs: [make-date-tag, build-image-list]
+      outputs:
+        image_matrix: ${{ steps.create-matrix.outputs.image_matrix }}
+        default_image_matrix: ${{ steps.create-default-matrix.outputs.default_image_matrix }}
+      strategy:
+        fail-fast: false
+        matrix:
+          image: ${{ fromJson(needs.build-image-list.outputs.images) }}
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+    
+        - name: Check for build-config.json in ${{ matrix.image }}
+          id: check-jsonfile
+          run: |
+            if [ -f "${{ matrix.image }}/build-config.json" ]; then
+              echo "build-config.json exists in ${{ matrix.image }}"
+              echo "config_exists=true" >> $GITHUB_OUTPUT
+            else
+              echo "No build-config.json found in ${{ matrix.image }}"
+              echo "config_exists=false" >> $GITHUB_OUTPUT
+            fi
+    
+        - name: Read build-config.json in ${{ matrix.image }}
+          id: read-config
+          if: steps.check-jsonfile.outputs.config_exists == 'true'
+          run: |
+            config=$(cat ${{ matrix.image }}/build-config.json)
+            base_names=$(echo $config | jq -r '.base_os.base_name | join(",")')
+            base_versions=$(echo $config | jq -r '.base_os.base_version | join(",")')
+            base_repo=$(echo $config | jq -r '.base_repo')
+            for base_name in $(echo $base_names | tr "," "\n"); do
+              for base_version in $(echo $base_versions | tr "," "\n"); do
+                echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix.json
+              done
             done
-          done
-          cat matrix.json
-          matrix=$(jq -c -s '.' matrix.json)
-          echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
-
-      # Create the build matrix from build-config.json
-      - name: Create build matrix
-        id: create-matrix
-        if: steps.check-jsonfile.outputs.config_exists == 'true'
-        run: |
-          matrix=$(jq -c -s '.' matrix.json)
-          echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
-
-      # Read default-build-config.json if build-config.json does not exist
-      - name: Read default-build-config.json
-        id: read-default-config
-        if: steps.check-jsonfile.outputs.config_exists == 'false'
-        run: |
-          default_config=$(cat opensciencegrid/default-build-config.json)
-          echo "default-build-config.json content: $default_config"
-          base_names=$(echo $default_config | jq -r '.base_os.base_name | join(",")')
-          base_versions=$(echo $default_config | jq -r '.base_os.base_version | join(",")')
-          base_repo=$(echo $default_config | jq -r '.base_repo')
-          for base_name in $(echo $base_names | tr "," "\n"); do
-            for base_version in $(echo $base_versions | tr "," "\n"); do
-              echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix_default.json
+            cat matrix.json
+            matrix=$(jq -c -s '.' matrix.json)
+            echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
+    
+        - name: Create build matrix
+          id: create-matrix
+          if: steps.check-jsonfile.outputs.config_exists == 'true'
+          run: |
+            matrix=$(jq -c -s '.' matrix.json)
+            echo "image_matrix=$matrix" >> $GITHUB_OUTPUT
+    
+        - name: Read default-build-config.json
+          id: read-default-config
+          if: steps.check-jsonfile.outputs.config_exists == 'false'
+          run: |
+            default_config=$(cat opensciencegrid/default-build-config.json)
+            echo "default-build-config.json content: $default_config"
+            base_names=$(echo $default_config | jq -r '.base_os.base_name | join(",")')
+            base_versions=$(echo $default_config | jq -r '.base_os.base_version | join(",")')
+            base_repo=$(echo $default_config | jq -r '.base_repo')
+            for base_name in $(echo $base_names | tr "," "\n"); do
+              for base_version in $(echo $base_versions | tr "," "\n"); do
+                echo "{ \"image\": \"${{ matrix.image }}\", \"base_name\": \"$base_name\", \"base_version\": \"$base_version\", \"base_repo\": \"$base_repo\" }" >> matrix_default.json
+              done
             done
-          done
-          cat matrix_default.json
-          matrix_default=$(jq -c -s '.' matrix_default.json)
-          echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
-
-      # Create the default build matrix from default-build-config.json
-      - name: Create default build matrix
-        id: create-default-matrix
-        if: steps.check-jsonfile.outputs.config_exists == 'false'
-        run: |
-          matrix_default=$(jq -c -s '.' matrix_default.json)
-          echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
-
-  # Job to combine matrices and trigger builds
-  combine-matrices:
-    runs-on: ubuntu-latest
-    needs: check-config
-    outputs:
-      combined_matrix: ${{ steps.combine.outputs.combined_matrix }}
-    steps:
-      - name: Combine matrices
-        id: combine
-        run: |
-          image_matrix='${{ needs.check-config.outputs.image_matrix }}'
-          default_image_matrix='${{ needs.check-config.outputs.default_image_matrix }}'
-          combined_matrix=$(jq -c -s '.[0] + .[1]' <<<"$image_matrix $default_image_matrix")
-          echo "$combined_matrix" > combined_matrix.json
-          cat combined_matrix.json
-          echo "combined_matrix=$(cat combined_matrix.json)" >> $GITHUB_OUTPUT
-
-  # Job to trigger builds for each configuration in the combined matrix
-  trigger-builds:
-    needs: combine-matrices
-    runs-on: ubuntu-latest
-    if: needs.build-image-list.outputs.images != '["dummy"]'
-   # Prevent a single build failure from killing the workflow.
-   # This is safe since subsequent pushes should fail on cache load
-    continue-on-error: true
-    strategy:
-      fail-fast: false
-      matrix:
-        build_config: ${{ fromJson(needs.combine-matrices.outputs.combined_matrix) }}
-    steps:
-      - name: Debug build_config
-        run: echo ${{ matrix.build_config }}
-
-      # Build the image with the specified configuration
-      - name: Build ${{ matrix.build_config.image }}:${{ matrix.build_config.base_name }}-${{ matrix.build_config.base_repo }}
-        uses: opensciencegrid/build-container-action@v0.6.0
-        with:
-          osg_series: ${{ matrix.build_config.base_version }}
-          osg_repo: ${{ matrix.build_config.base_repo }}
-          context: ${{ matrix.build_config.image }}
-          base_os: ${{ matrix.build_config.base_name }}
-        env:
-          BASE_NAME: ${{ matrix.build_config.base_name }}
-          BASE_VERSION: ${{ matrix.build_config.base_version }}
-          BASE_REPO: ${{ matrix.build_config.base_repo }}
-
-      # Push the built image to Harbor development repository
-      - name: Push to Harbor (${{ matrix.build_config.base_version }}-development)
-        if: matrix.build_config.base_version != '23'
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: development
-          osg_series: ${{ matrix.build_config.base_version }}
-          context: ${{ matrix.build_config.image }}
-          base_os: ${{ matrix.build_config.base_name }}
-          registry_url: hub.opensciencegrid.org
-          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
-          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
-
-      # Push the built image to Harbor testing repository
-      - name: Push to Harbor (${{ matrix.build_config.base_version }}-testing)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: testing
-          osg_series: ${{ matrix.build_config.base_version }}
-          context: ${{ matrix.build_config.image }}
-          base_os: ${{ matrix.build_config.base_name }}
-          registry_url: hub.opensciencegrid.org
-          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
-          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
-
-      # Push the built image to Harbor release repository
-      - name: Push to Harbor (${{ matrix.build_config.base_version }}-release)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: release
-          osg_series: ${{ matrix.build_config.base_version }}
-          context: ${{ matrix.build_config.image }}
-          base_os: ${{ matrix.build_config.base_name }}
-          registry_url: hub.opensciencegrid.org
-          registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
-          registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
-
-      # Push the built image to Docker Hub development repository
-      - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-development)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: development
-          osg_series: ${{ matrix.build_config.base_version }}
-          context: ${{ matrix.build_config.image }}
-          base_os: ${{ matrix.build_config.base_name }}
-          registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
-
-      # Push the built image to Docker Hub testing repository
-      - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-testing)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: testing
-          osg_series: ${{ matrix.build_config.base_version }}
-          context: ${{ matrix.build_config.image }}
-          base_os: ${{ matrix.build_config.base_name }}
-          registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
-
-      # Push the built image to Docker Hub release repository
-      - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-release)
-        if: always()
-        uses: opensciencegrid/push-container-action@main
-        with:
-          repo: release
-          osg_series: ${{ matrix.build_config.base_version }}
-          context: ${{ matrix.build_config.image }}
-          base_os: ${{ matrix.build_config.base_name }}
-          registry_url: docker.io
-          registry_user: ${{ secrets.DOCKER_USERNAME }}
-          registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+            cat matrix_default.json
+            matrix_default=$(jq -c -s '.' matrix_default.json)
+            echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
+    
+        - name: Create default build matrix
+          id: create-default-matrix
+          if: steps.check-jsonfile.outputs.config_exists == 'false'
+          run: |
+            matrix_default=$(jq -c -s '.' matrix_default.json)
+            echo "default_image_matrix=$matrix_default" >> $GITHUB_OUTPUT
+    
+    combine-matrices:
+      runs-on: ubuntu-latest
+      needs: check-config
+      outputs:
+        combined_matrix: ${{ steps.combine.outputs.combined_matrix }}
+      steps:
+        - name: Combine matrices
+          id: combine
+          run: |
+            image_matrix='${{ needs.check-config.outputs.image_matrix }}'
+            default_image_matrix='${{ needs.check-config.outputs.default_image_matrix }}'
+            combined_matrix=$(jq -c -s '.[0] + .[1]' <<<"$image_matrix $default_image_matrix")
+            echo "$combined_matrix" > combined_matrix.json
+            cat combined_matrix.json
+            echo "combined_matrix=$(cat combined_matrix.json)" >> $GITHUB_OUTPUT
+    
+    build:
+      runs-on: ubuntu-latest
+      needs: combine-matrices
+      if: needs.build-image-list.outputs.images != '["dummy"]'
+      # Prevent a single build failure from killing the workflow.
+      # This is safe since subsequent pushes should fail on cache load
+      continue-on-error: true
+      strategy:
+        fail-fast: false
+        matrix:
+          build_config: ${{ fromJson(needs.combine-matrices.outputs.combined_matrix) }}
+      steps:
+        - name: Debug build_config
+          run: echo ${{ matrix.build_config }}
+    
+        - name: Build ${{ matrix.build_config.image }}:${{ matrix.build_config.base_name }}-${{ matrix.build_config.base_repo }}
+          uses: opensciencegrid/build-container-action@v0.6.0
+          with:
+            osg_series: ${{ matrix.build_config.base_version }}
+            osg_repo: ${{ matrix.build_config.base_repo }}
+            context: ${{ matrix.build_config.image }}
+            base_os: ${{ matrix.build_config.base_name }}
+          env:
+            BASE_NAME: ${{ matrix.build_config.base_name }}
+            BASE_VERSION: ${{ matrix.build_config.base_version }}
+            BASE_REPO: ${{ matrix.build_config.base_repo }}
+    
+        - name: Push to Harbor (${{ matrix.build_config.base_version }}-development)
+          if: matrix.build_config.base_version != '23'
+          uses: opensciencegrid/push-container-action@main
+          with:
+            repo: development
+            osg_series: ${{ matrix.build_config.base_version }}
+            context: ${{ matrix.build_config.image }}
+            base_os: ${{ matrix.build_config.base_name }}
+            registry_url: hub.opensciencegrid.org
+            registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+            registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+    
+        - name: Push to Harbor (${{ matrix.build_config.base_version }}-testing)
+          if: always()
+          uses: opensciencegrid/push-container-action@main
+          with:
+            repo: testing
+            osg_series: ${{ matrix.build_config.base_version }}
+            context: ${{ matrix.build_config.image }}
+            base_os: ${{ matrix.build_config.base_name }}
+            registry_url: hub.opensciencegrid.org
+            registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+            registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+    
+        - name: Push to Harbor (${{ matrix.build_config.base_version }}-release)
+          if: always()
+          uses: opensciencegrid/push-container-action@main
+          with:
+            repo: release
+            osg_series: ${{ matrix.build_config.base_version }}
+            context: ${{ matrix.build_config.image }}
+            base_os: ${{ matrix.build_config.base_name }}
+            registry_url: hub.opensciencegrid.org
+            registry_user: ${{ secrets.OSG_HARBOR_ROBOT_USER }}
+            registry_pass: ${{ secrets.OSG_HARBOR_ROBOT_PASSWORD }}
+    
+        - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-development)
+          if: always()
+          uses: opensciencegrid/push-container-action@main
+          with:
+            repo: development
+            osg_series: ${{ matrix.build_config.base_version }}
+            context: ${{ matrix.build_config.image }}
+            base_os: ${{ matrix.build_config.base_name }}
+            registry_url: docker.io
+            registry_user: ${{ secrets.DOCKER_USERNAME }}
+            registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+    
+        - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-testing)
+          if: always()
+          uses: opensciencegrid/push-container-action@main
+          with:
+            repo: testing
+            osg_series: ${{ matrix.build_config.base_version }}
+            context: ${{ matrix.build_config.image }}
+            base_os: ${{ matrix.build_config.base_name }}
+            registry_url: docker.io
+            registry_user: ${{ secrets.DOCKER_USERNAME }}
+            registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+    
+        - name: Push to Docker Hub (${{ matrix.build_config.base_version }}-release)
+          if: always()
+          uses: opensciencegrid/push-container-action@main
+          with:
+            repo: release
+            osg_series: ${{ matrix.build_config.base_version }}
+            context: ${{ matrix.build_config.image }}
+            base_os: ${{ matrix.build_config.base_name }}
+            registry_url: docker.io
+            registry_user: ${{ secrets.DOCKER_USERNAME }}
+            registry_pass: ${{ secrets.DOCKER_PASSWORD }}
+  
