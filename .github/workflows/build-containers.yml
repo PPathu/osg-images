@@ -27,6 +27,7 @@
           with:
             fetch-depth: 0
   
+            
         - id: image-list
           run: |
             ORG_DIR=opensciencegrid
