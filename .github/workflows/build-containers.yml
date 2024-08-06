@@ -90,7 +90,7 @@ jobs:
       - name: Verify matrix content
         run: |
           echo "Content of matrix:"
-          echo "${{ steps.run-python-script.outputs.matrix }}"
+          echo "${{ steps.set_matrix.outputs.matrix }}"
   build:
     runs-on: ubuntu-latest
     needs: build-image-list
