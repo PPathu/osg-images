@@ -78,8 +78,8 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Run build-job-matrix script
-        id: run-python-script
+      - name: Set matrix output
+        id: set-matrix
         run: |
           # Run Python script and capture JSON output
           matrix_json=$(python scripts/build-job-matrix.py ${{ steps.image-list.outputs.images }} | tail -n +2)
