@@ -155,7 +155,7 @@ jobs:
 
       - name: Print raw matrix configuration
         run: |
-          echo "Raw matrix configuration: ${{ matrix }}"
+          echo "Raw matrix configuration: ${{ matrix.config }}"
       - name: Set environment variables
         id: set-env-vars
         run: |
