@@ -72,7 +72,9 @@ jobs:
           fi
 
           images=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
-          images=$(echo $images | tr -d '[:space:]')
+          if [ "$images" == '["dummy"]' ]; then
+            images="dummy"
+          fi
           echo "images=$images" >> $GITHUB_OUTPUT
                     
           
