@@ -75,7 +75,14 @@ jobs:
 
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
           echo "image_lists=$image_json" >> $GITHUB_OUTPUT
-          echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          # Process the images variable to replace newlines with spaces
+          processed_images=$(echo $images | tr '\n' ' ')
+
+          # Print the processed images variable
+          echo "Processed images: $processed_images"
+
+          # Write the processed images to the GitHub output
+          echo "images=$processed_images" >> $GITHUB_OUTPUT
 
           
 
