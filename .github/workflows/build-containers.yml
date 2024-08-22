@@ -73,9 +73,9 @@ jobs:
 
           
 
-          image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
+          images=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
           echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
-          echo "image_lists=$image_json" >> $GITHUB_OUTPUT
+          echo "images=$images" >> $GITHUB_OUTPUT
                     
           
 
