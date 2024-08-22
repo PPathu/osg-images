@@ -71,7 +71,9 @@ jobs:
                                       -printf "$ORG_DIR/%P\n")
           fi
 
+          image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
           echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          echo "image_list=$image_json" >> $GITHUB_OUTPUT
 
       - name: Display images list
         run: echo "${{ steps.image-list.outputs.images }}"
