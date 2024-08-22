@@ -73,12 +73,9 @@ jobs:
 
           
 
-          if [ -z "$images" ]; then
-          image_json=dummy
-          else
-          image_json=$(echo -n "$images" | jq -Rcs '.|split("\n") | map(select(. != "")) | join(" ")')
-          fi
-          echo "image_lists=\"$image_json\"" >> $GITHUB_OUTPUT
+          image_json=$(echo -n "${images:-dummy}" | jq -Rcs 'split("\n") | map(select(. != "")) | if length == 1 and .[0] == "dummy" then .[0] else join(" ") end')
+          echo "image_lists=$image_json" >> $GITHUB_OUTPUT
+
 
           echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
