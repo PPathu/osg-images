@@ -71,13 +71,9 @@ jobs:
                                       -printf "$ORG_DIR/%P\n")
           fi
 
-          images=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
-          if [ "$images" == '["dummy"]' ]; then
-          images="dummy"
-          else
-          images=$(echo $images | tr '\n' ' ')
-          fi
-          echo "images=$images" >> $GITHUB_OUTPUT
+          image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
+          echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          echo "image_lists=$image_json" >> $GITHUB_OUTPUT
                     
           
 
