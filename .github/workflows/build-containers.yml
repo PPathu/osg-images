@@ -71,7 +71,7 @@ jobs:
                                       -printf "$ORG_DIR/%P\n")
           fi
 
-          image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
+          images=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
           echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT 
           
           
