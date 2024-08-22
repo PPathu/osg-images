@@ -74,10 +74,12 @@ jobs:
           
 
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
+          image_json=$(echo -n "$image_json" | sed 's/[[:space:]]*$//') # Remove any trailing space
           echo "image_lists=$image_json" >> $GITHUB_OUTPUT
 
-          # Remove trailing space before saving to GITHUB_OUTPUT
+          # Also ensure no trailing space in the images variable
           echo "images=$(echo $images | tr '\n' ' ' | sed 's/[[:space:]]*$//')" >> $GITHUB_OUTPUT
+
 
           
 
