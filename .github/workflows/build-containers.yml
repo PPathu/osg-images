@@ -72,8 +72,9 @@ jobs:
           fi
 
           images=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
-          echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT 
-          
+          images=$(echo $images | tr -d '[:space:]')
+          echo "images=$images" >> $GITHUB_OUTPUT
+                    
           
 
       - name: Display images list
@@ -101,7 +102,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: build-image-list
-    if: ${{ needs.build-image-list.outputs.images != 'dummy ' }}
+    if: ${{ needs.build-image-list.outputs.images != 'dummy' }}
     # Prevent a single build failure from killing the workflow.
     # This is safe since subsequent pushes should fail on cache load
     continue-on-error: true
