@@ -76,7 +76,7 @@ jobs:
           echo "image_list=$image_json" >> $GITHUB_OUTPUT
 
       - name: Display images list
-        run: echo "${{ steps.image-list.outputs.image_lists }}"
+        run: echo "${{ steps.image-list.outputs.images }}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
