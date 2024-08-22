@@ -71,12 +71,19 @@ jobs:
                                       -printf "$ORG_DIR/%P\n")
           fi
 
-          
-
+          # Generate the images list
           images=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
-          echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
-          
-                    
+
+          # Process images to handle the "dummy" case and formatting
+          if [ "$images" == '["dummy"]' ]; then
+            formatted_images="dummy"
+          else
+            formatted_images=$(echo $images | tr '\n' ' ')
+          fi
+
+          # Output both image_json and formatted images
+          echo "image_lists=$images" >> $GITHUB_OUTPUT
+          echo "images=$formatted_images" >> $GITHUB_OUTPUT
           
 
       - name: Display images list
