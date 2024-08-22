@@ -1,4 +1,5 @@
----
+# Workflow File
+
 name: Build and push container images
 
 on:
@@ -22,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-      image_list: ${{ steps.image-list.outputs.image_list }}
+      images: ${{ steps.image-list.outputs.images }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -70,13 +71,10 @@ jobs:
                                       -printf "$ORG_DIR/%P\n")
           fi
 
-            image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
-            echo "$image_json" > image_list.json
-            echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
-            echo "image_list=$image_json" >> $GITHUB_OUTPUT
+          echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
-      - name: Display image list
-        run: cat image_list.json
+      - name: Display images list
+        run: echo "${{ steps.image-list.outputs.images }}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -91,7 +89,6 @@ jobs:
           # Use jq to extract the 'include' part of the JSON
           matrix=$(echo "$matrix_json" | jq -c '.include')
           echo "::set-output name=matrix::$matrix"
-          echo "::set-output name=image_list::$image_json"
         
       - name: Verify matrix content
         run: |
@@ -101,7 +98,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: build-image-list
-    if: ${{ needs.build-image-list.outputs.image_list != '["dummy"]' }}
+    if: ${{ needs.build-image-list.outputs.images != 'dummy' }}
     # Prevent a single build failure from killing the workflow.
     # This is safe since subsequent pushes should fail on cache load
     continue-on-error: true
@@ -155,7 +152,7 @@ jobs:
       github.ref == 'refs/heads/main' &&
       github.event_name != 'pull_request' &&
       github.repository_owner == 'opensciencegrid' &&
-      needs.build-image-list.outputs.image_list != '["dummy"]'
+      needs.build-image-list.outputs.images != 'dummy'
     needs: [make-date-tag, build-image-list, build]
     strategy:
       fail-fast: false
