@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-      images: ${{ steps.image-list.outputs.images }}
+      image_lists: ${{ steps.image-list.outputs.image_lists }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -71,19 +71,12 @@ jobs:
                                       -printf "$ORG_DIR/%P\n")
           fi
 
-          # Generate the images list
-          images=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
+          
 
-          # Process images to handle the "dummy" case and formatting
-          if [ "$images" == '["dummy"]' ]; then
-            formatted_images="dummy"
-          else
-            formatted_images=$(echo $images | tr '\n' ' ')
-          fi
+          image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
+          echo "image_lists=$image_json" >> $GITHUB_OUTPUT
 
-          # Output both image_json and formatted images
-          echo "image_lists=$images" >> $GITHUB_OUTPUT
-          echo "images=$formatted_images" >> $GITHUB_OUTPUT
+          echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
           
 
       - name: Display images list
@@ -111,7 +104,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: build-image-list
-    if: ${{ needs.build-image-list.outputs.images != 'dummy' }}
+    if: ${{ needs.build-image-list.outputs.image_lists != '["dummy"]' }}
     # Prevent a single build failure from killing the workflow.
     # This is safe since subsequent pushes should fail on cache load
     continue-on-error: true
