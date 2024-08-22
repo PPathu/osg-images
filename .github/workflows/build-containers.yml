@@ -74,12 +74,10 @@ jobs:
           
 
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
-          image_json=$(echo -n "$image_json" | sed 's/[[:space:]]*$//') # Remove any trailing space
           echo "image_lists=$image_json" >> $GITHUB_OUTPUT
 
-          # Also ensure no trailing space in the images variable
+          # Remove trailing space before saving to GITHUB_OUTPUT
           echo "images=$(echo $images | tr '\n' ' ' | sed 's/[[:space:]]*$//')" >> $GITHUB_OUTPUT
-
 
           
 
@@ -108,7 +106,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: build-image-list
-    if: ${{ needs.build-image-list.outputs.images != 'dummy' }}
+    if: ${{ needs.build-image-list.outputs.images != '["dummy"]' }}
     # Prevent a single build failure from killing the workflow.
     # This is safe since subsequent pushes should fail on cache load
     continue-on-error: true
