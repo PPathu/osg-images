@@ -80,7 +80,7 @@ jobs:
           
 
       - name: Display images list
-        run: echo "${{ steps.image-list.outputs.images }}"
+        run: echo "${{ steps.image-list.outputs.image_lists }}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
