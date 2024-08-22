@@ -74,7 +74,7 @@ jobs:
           
 
           if [ -z "$images" ]; then
-          image_json="dummy"
+          image_json=dummy
           else
           image_json=$(echo -n "$images" | jq -Rcs '.|split("\n") | map(select(. != "")) | join(" ")')
           fi
