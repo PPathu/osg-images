@@ -76,7 +76,9 @@ jobs:
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
           echo "image_lists=$image_json" >> $GITHUB_OUTPUT
 
-          echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          # Remove trailing space before saving to GITHUB_OUTPUT
+          echo "images=$(echo $images | tr '\n' ' ' | sed 's/[[:space:]]*$//')" >> $GITHUB_OUTPUT
+
           
 
       - name: Display images list
