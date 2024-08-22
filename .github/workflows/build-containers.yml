@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-      images: ${{ steps.image-list.outputs.image_lists }}
+      images: ${{ steps.image-list.outputs.images }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -80,7 +80,7 @@ jobs:
           
 
       - name: Display images list
-        run: echo "${{ steps.image-list.outputs.image_lists }}"
+        run: echo "${{ steps.image-list.outputs.images }}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
