@@ -74,6 +74,7 @@ jobs:
           image_json=$(echo -n "${images:-dummy}" | jq -Rcs '.|split("\n") | map(select(. != ""))')
           echo "images=$(echo $images | tr '\n' ' ')" >> $GITHUB_OUTPUT
           echo "images=$image_json" >> $GITHUB_OUTPUT
+          echo "images=$images" >> $GITHUB_OUTPUT
 
       - name: Display images list
         run: echo "${{ steps.image-list.outputs.images }}"
